@@ -1,15 +1,12 @@
 @import url(//fonts.googleapis.com/css?family=Bungee);
- body {
-	 margin: 0;
-	 background: rgba(34, 34, 34, 0.457);
-	 overflow: hidden;
-}
+
  #container {
 	 position: fixed;
 	 left: 45vw;
 	 top: calc(50vh - 5vw);
 	 width: 140vw;
 	 height: 10vw;
+	 background: rgba(34, 34, 34, 0.457);
 }
  @keyframes rotate {
 	 0% {

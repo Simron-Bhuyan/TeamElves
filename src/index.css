@@ -6,6 +6,8 @@ body,html{
     font-family: 'Lato', sans-serif;  
 width: 100vw;
 min-height: 100vh;
+margin: 0;
+	 overflow: hidden;
 }
 
 .hide-scrollbar::-webkit-scrollbar{
