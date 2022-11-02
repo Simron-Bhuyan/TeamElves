@@ -7,9 +7,7 @@ function Navbar(props) {
     <div className="flex flex-wrap">
       <h1 className={props.darkMode ? "text-neutral-900 font-semibold text-xl":"text-stone-50 font-semibold text-lg"} >DETECTO</h1>
   </div>
-      {/* <img onClick={props.toggleDarkMode} 
-              className="self-left justify-self-end" 
-              src={props.darkMode ? "./assets/toggle-icon-dark.svg" : "./assets/toggle-icon-dark.svg"}  />*/}
+     
               <div className={props.darkMode ? "text-neutral-900 grid grid-cols-4 place-content-between justify-self-end mr-4":"text-stone-50 grid grid-cols-4 place-content-between justify-self-end mr-4"}>
               <div className="self-left justify-self-center px-2 cursor-pointer">About</div>
               <a className="flex self-left justify-self-center px-2 cursor-pointer" href="https://github.com/Simron-Bhuyan/TeamElves">Github <BsBoxArrowInUpRight className="ustify-self-center"/></a>
