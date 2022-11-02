@@ -3,7 +3,7 @@ import '../Stylesheets/Spinner.css'
 const Spinner = () => {
   return (
     <span className='garbage'>
-      <span className={'container'}>
+      <span className='container'>
         <span className="petal"></span>
         <span className="petal"></span>
         <span className="petal"></span>
@@ -24,7 +24,7 @@ const Spinner = () => {
         <span className="petal"></span>
         <span className="petal"></span>
         <span className="petal"></span>
-        <span className={'logo'}></span>
+        <span className={'logo'}>D</span>
       </span>
     </span>
   )

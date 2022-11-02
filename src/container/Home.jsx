@@ -1,5 +1,6 @@
-import React from "react";
-// import Spinner from '../components/Spinner'
+import React from 'react'
+import Spinner from '../components/Spinner'
+import Navbar from '../components/Navbar'
 function Home() {
   return (
     <div className="w-[100vw] overflow-hidden">
@@ -18,7 +19,7 @@ function Home() {
               Read More
             </button>
             <button className="ml-5 px-4 py-2 rounded-3xl font-bold text-xl text-[#a74b94]">
-              Get Started >>
+              Get Started..
             </button>
           </div>
         </div>
