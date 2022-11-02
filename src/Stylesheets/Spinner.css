@@ -1,13 +1,13 @@
 @import url(//fonts.googleapis.com/css?family=Bungee);
-
- #container {
+/* 
+ .container {
 	 position: fixed;
 	 left: 45vw;
 	 top: calc(50vh - 5vw);
-	 width: 140vw;
+	 width: 100vw;
 	 height: 10vw;
 	 background: rgba(34, 34, 34, 0.457);
-}
+} */
  @keyframes rotate {
 	 0% {
 		 transform: rotate(0deg);
