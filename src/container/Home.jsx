@@ -1,10 +1,23 @@
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import Spinner from '../components/Spinner'
 import Navbar from '../components/Navbar'
 function Home() {
-  return (
-    <div className="w-[100vw] overflow-hidden">
-      {/* <Spinner/> */}
+  const [darkMode,toggleDarkMode]=useState(true)
+  const [isLoding, setIsLoding] = useState(true);
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoding(false);
+    }, 3999);
+  }, []);
+  return (<>
+    {isLoding ? (
+      <Spinner />
+    ) : (
+    <div className={`overflow-hidden ${darkMode ? "dark" : "light"}`}>
+    <Navbar 
+    darkMode={darkMode} 
+    toggleDarkMode={toggleDarkMode} 
+/>
       <div className="hero h-[90vh] flex w-[100vw]">
         <div className="heroLeft flex w-[55%] h-[100%] justify-center items-center p-20 pr-32">
           <div>
@@ -89,7 +102,7 @@ function Home() {
 
         </div>
       </div>
-    </div>
+    </div>)}</>
   );
 }
 
