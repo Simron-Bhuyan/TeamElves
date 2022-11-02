@@ -1,133 +1,206 @@
 @import url(//fonts.googleapis.com/css?family=Bungee);
-/* 
- .container {
-	 position: fixed;
-	 left: 45vw;
-	 top: calc(50vh - 5vw);
-	 width: 100vw;
-	 height: 10vw;
+
+/* body {
+	 margin: 0;
 	 background: rgba(34, 34, 34, 0.457);
+	 overflow: hidden;
 } */
- @keyframes rotate {
-	 0% {
-		 transform: rotate(0deg);
-		 filter: hue-rotate(360deg);
+
+@keyframes inv {
+	0% {
+		opacity: 1;
 	}
-	 50% {
-		 transform: rotate(360deg);
-		 filter: hue-rotate(0deg);
+
+	75% {
+		opacity: 0.9;
 	}
-	 100% {
-		 transform: rotate(360deg);
-		 filter: hue-rotate(0deg);
+
+	90% {
+		opacity: 0.5;
+	}
+
+	100% {
+		opacity: 0;
 	}
 }
- @keyframes logoan {
+
+.garbage {
+	width: 100vw;
+	height: 80vh;
+	justify-content: center;
+	align-items: center;
+	opacity: 0;
+	display: grid;
+	animation-name: inv;
+	animation-duration: 4s;
+	animation-iteration-count: 1;
+	animation-direction: normal;
+	animation-timing-function: ease-in-out;
+	overflow: hidden !important;
+}
+
+.container {
+	position: fixed;
+	/* top: 45vh; */
+	width: max-content;
+	height: max-content;
+	margin: 0 45vw;
+	/* padding: 1rem; */
+	/* overflow: hidden !important; */
+}
+
+@keyframes rotate {
+	0% {
+		transform: rotate(0deg);
+		filter: hue-rotate(360deg);
+		opacity: 1;
+	}
+
+	50% {
+		transform: rotate(360deg);
+		filter: hue-rotate(0deg);
+		opacity: 1;
+	}
+
+	100% {
+		transform: rotate(360deg);
+		filter: hue-rotate(0deg);
+		display: none;
+	}
+}
+
+@keyframes logoan {
+
 	/* 50% {
 		 filter: hue-rotate(0deg);
 	}
 	 */
-	 0% {
-		 filter: hue-rotate(360deg);
+	0% {
+		/* filter: hue-rotate(360deg); */
+		opacity: 1;
 	}
-	 100% {
-		 filter: hue-rotate(0deg);
+
+	100% {
+		/* filter: hue-rotate(0deg); */
+		opacity: 0;
+		/* display: none; */
 	}
-}
- .petal {
-	 width: 10vw;
-	 height: 10vw;
-	 position: absolute;
-	 background: rgba(123, 191, 64, 0.36);
-	 border-style: solid;
-	 border-color: rgba(123, 191, 64, 0.5);
-	 animation-name: rotate;
-	 animation-duration: 4s;
-	 animation-iteration-count: infinite;
-	 animation-direction: normal;
-	 animation-timing-function: ease-in-out;
-	 mix-blend-mode: screen;
-	 border-radius: 90% 90% 90% 0;
 }
 
- .logo {
-	 width: 10vw;
-	 height: 10vw;
-	 position: absolute;
-	 vertical-align: middle;
-	 line-height: 10vw;
-	 align-items: center;
-	 font-size: 6vw;
-	 font-family: 'Bungee';
-	 text-align: center;
-	 border-radius: 90% 90% 90% 90%;
-	 border-style: solid;
-	 border-color: rgba(123, 191, 63, 0.0);
-	 color: rgba(123, 191, 63, 0.6);
-	 animation-name: logoan;
-	 animation-duration: 4s;
-	 animation-iteration-count: infinite;
-	 animation-direction: normal;
-	 animation-timing-function: ease-in-out;
+.petal {
+	width: 10vw;
+	height: 10vw;
+	position: absolute;
+	background: #a74b9480;
+	border-style: solid;
+	border-color: #a74b9480;
+	animation-name: rotate;
+	animation-duration: 4s;
+	animation-iteration-count: 2;
+	animation-direction: normal;
+	animation-timing-function: ease-in-out;
+	/* mix-blend-mode: screen; */
+	border-radius: 90% 90% 90% 0;
 }
- .petal:nth-child(0) {
-	 animation-delay: 0ms;
+
+.logo {
+	width: 10vw;
+	height: 10vw;
+	position: absolute;
+	vertical-align: middle;
+	line-height: 10vw;
+	align-items: center;
+	font-size: 6vw;
+	font-family: 'Bungee';
+	text-align: center;
+	border-radius: 90% 90% 90% 90%;
+	border-style: solid;
+	border-color: rgba(123, 191, 63, 0.0);
+	color: rgba(123, 191, 63, 0.6);
+	animation-name: logoan;
+	animation-duration: 4s;
+	animation-iteration-count: 2;
+	animation-direction: normal;
+	animation-timing-function: ease-in-out;
+	border: none;
 }
- .petal:nth-child(1) {
-	 animation-delay: 100ms;
+
+.petal:nth-child(0) {
+	animation-delay: 0ms;
 }
- .petal:nth-child(2) {
-	 animation-delay: 200ms;
+
+.petal:nth-child(1) {
+	animation-delay: 100ms;
 }
- .petal:nth-child(3) {
-	 animation-delay: 300ms;
+
+.petal:nth-child(2) {
+	animation-delay: 200ms;
 }
- .petal:nth-child(4) {
-	 animation-delay: 400ms;
+
+.petal:nth-child(3) {
+	animation-delay: 300ms;
 }
- .petal:nth-child(5) {
-	 animation-delay: 500ms;
+
+.petal:nth-child(4) {
+	animation-delay: 400ms;
 }
- .petal:nth-child(6) {
-	 animation-delay: 600ms;
+
+.petal:nth-child(5) {
+	animation-delay: 500ms;
 }
- .petal:nth-child(7) {
-	 animation-delay: 700ms;
+
+.petal:nth-child(6) {
+	animation-delay: 600ms;
 }
- .petal:nth-child(8) {
-	 animation-delay: 800ms;
+
+.petal:nth-child(7) {
+	animation-delay: 700ms;
 }
- .petal:nth-child(9) {
-	 animation-delay: 900ms;
+
+.petal:nth-child(8) {
+	animation-delay: 800ms;
 }
- .petal:nth-child(10) {
-	 animation-delay: 1000ms;
+
+.petal:nth-child(9) {
+	animation-delay: 900ms;
 }
- .petal:nth-child(11) {
-	 animation-delay: 1100ms;
+
+.petal:nth-child(10) {
+	animation-delay: 1000ms;
 }
- .petal:nth-child(12) {
-	 animation-delay: 1200ms;
+
+.petal:nth-child(11) {
+	animation-delay: 1100ms;
 }
- .petal:nth-child(13) {
-	 animation-delay: 1300ms;
+
+.petal:nth-child(12) {
+	animation-delay: 1200ms;
 }
- .petal:nth-child(14) {
-	 animation-delay: 1400ms;
+
+.petal:nth-child(13) {
+	animation-delay: 1300ms;
 }
- .petal:nth-child(15) {
-	 animation-delay: 1500ms;
+
+.petal:nth-child(14) {
+	animation-delay: 1400ms;
 }
- .petal:nth-child(16) {
-	 animation-delay: 1600ms;
+
+.petal:nth-child(15) {
+	animation-delay: 1500ms;
 }
- .petal:nth-child(17) {
-	 animation-delay: 1700ms;
+
+.petal:nth-child(16) {
+	animation-delay: 1600ms;
 }
- .petal:nth-child(18) {
-	 animation-delay: 1800ms;
+
+.petal:nth-child(17) {
+	animation-delay: 1700ms;
 }
- .petal:nth-child(19) {
-	 animation-delay: 1900ms;
+
+.petal:nth-child(18) {
+	animation-delay: 1800ms;
 }
- 
+
+.petal:nth-child(19) {
+	animation-delay: 1900ms;
+}

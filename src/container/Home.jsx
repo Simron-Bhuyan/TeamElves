@@ -3,8 +3,8 @@ import Spinner from '../components/Spinner'
 function Home() {
   return (
     <div>
-    <Spinner/>
-    Home</div>
+    <Spinner />
+    </div>
   )
 }
 
