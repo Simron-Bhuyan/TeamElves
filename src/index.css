@@ -2,18 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* body,html{
+body,html{
     font-family: 'Lato', sans-serif;  
-width: 100vw;
-min-height: 100vh;
 }
 
-.hide-scrollbar::-webkit-scrollbar{
-    display:none;
-} */
 
-@layer base {
-    * {
-        /* overflow: hidden; */
-    }
-}
+
