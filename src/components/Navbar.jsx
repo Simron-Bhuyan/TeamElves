@@ -5,7 +5,7 @@ import { BsFillSunFill, BsMoonStarsFill, BsBoxArrowInUpRight } from 'react-icons
 function Navbar(props) {
   return (
     <nav className="relative w-full flex flex-wrap items-center justify-between py-4 bg-purple navbar navbar-expand-lg navbar-light">
-      <div className="container-fluid w-full flex flex-wrap items-center justify-between px-6">
+      <div className="container-fluid w-full flex flex-wrap items-center sm:justify-around md:justify-between px-6">
       <div className="flex flex-wrap ">
         <h1 className={props.darkMode ? "text-neutral-900 font-semibold text-lg" : "text-stone-50 font-semibold text-lg"} >
         <a className="flex items-center h-[28px] my-2 mx-24 mb-4 md:my-0 md:ml-2">
