@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+// import {Link} from 'react-router-dom'
 import Spinner from '../components/Spinner'
 import Navbar from '../components/Navbar'
 import IntroPage from '../components/IntroPage'
