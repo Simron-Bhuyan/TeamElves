@@ -3,9 +3,9 @@ import { BsFillSunFill, BsMoonStarsFill, BsBoxArrowInUpRight } from 'react-icons
 
 function Navbar(props) {
   return (
-    <nav className="bg-[#a74b94] h-[max-content] py-4 px-2 t-0 grid grid-cols-2 place-content-between items-center w-full overflow-x-hidden">
+    <nav className="bg-[#a74b94] h-[max-content] py-4 px-2 t-0 flex flex-wrap justify-between items-center mx-auto w-full sm:px-1 overflow-x-hidden">
       <div className="flex flex-wrap">
-        <h1 className={props.darkMode ? "text-neutral-900 font-semibold text-xl" : "text-stone-50 font-semibold text-lg"} >DETECTO</h1>
+        <h1 className={props.darkMode ? "text-neutral-900 font-semibold text-lg" : "text-stone-50 font-semibold text-lg"} >DETECTO</h1>
       </div>
 
       <div className={props.darkMode ? "text-neutral-900 grid grid-cols-4 place-content-between justify-self-end mr-4" : "text-stone-50 grid grid-cols-4 place-content-between justify-self-end mr-4"}>
