@@ -6,10 +6,9 @@ function Footer() {
     <div>
     <footer className="p-4 bg-purple text-white sm:p-6 dark:bg-gray-900">
     <div class="md:flex md:justify-between">
-        <div className="mb-0 mx-8 md:mb-0">
-            <a className="flex items-center">
-                <img src="https://user-images.githubusercontent.com/89746011/199548760-e3011cf6-27cb-4a12-aebb-af1faf352175.png" className="h-32 " alt="Detecto Logo" />
-                {/* <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Detecto</span> */}
+        <div className="mb-8 mx-24 mb-4 md:mb-0 md:mt-6">
+            <a className="flex items-center h-[40px]">
+                <img src="https://user-images.githubusercontent.com/89746011/199548760-e3011cf6-27cb-4a12-aebb-af1faf352175.png" className="h-[10em] md:h-[12rem]" alt="Detecto Logo" />
             </a>
         </div>
         <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3 my-3">
