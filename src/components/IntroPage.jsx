@@ -15,8 +15,8 @@ function IntroPage() {
             <button className="px-4 py-2 bg-[#a74b94] rounded-3xl text-white">
               Read More
             </button>
-            <button className="ml-2 px-4 py-2 bg-[#f5f5f5] border-solid border-[0.5px] border-[#a74b94] rounded-3xl font-bold text-[#a74b94]">
-              Get Started...
+            <button className="ml-5 px-4 py-2 rounded-3xl font-bold text-xl text-[#a74b94]">
+              Get Started..
             </button>
           </div>
         </div>
