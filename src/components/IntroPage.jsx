@@ -1,5 +1,5 @@
 import React from 'react'
-
+import {Link} from 'react-router-dom'
 function IntroPage() {
   return (
     <div className="hero h-[90vh] flex w-[100vw]">
@@ -15,9 +15,11 @@ function IntroPage() {
             <button className="px-4 py-2 bg-[#a74b94] rounded-3xl text-white">
               Read More
             </button>
-            <button className="ml-2 px-4 py-2 bg-[#f5f5f5] border-solid border-[0.5px] border-[#a74b94] rounded-3xl font-bold text-[#a74b94]">
+            <Link to='/plagarism-checker'>
+            <button className="ml-2 px-4 py-2 bg-[#f5f5f5] border-solid border-[0.5px] border-[#a74b94] rounded-3xl font-bold text-[#a74b94]" >
               Get Started...
             </button>
+            </Link>
           </div>
         </div>
         <div className="heroRight bg-[#f5d7f5] w-[45%] relative">
