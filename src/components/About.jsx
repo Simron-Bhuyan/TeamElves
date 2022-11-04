@@ -1,10 +1,10 @@
 import React from 'react'
-
+import YoutubeEmbed from './Youtube'
 function About() {
   return (
     <div className="flex mt-40">
       <div className="flex h-[max-content] w-[60vw]  p-5">
-        <YoutubeEmbed embedId="rokGy0huYEA" />
+      <YoutubeEmbed embedId="rokGy0huYEA" />
       </div>
       <div className="Content flex p-5 items-center">
         <div>
