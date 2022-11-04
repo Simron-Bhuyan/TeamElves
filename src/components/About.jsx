@@ -1,5 +1,5 @@
 import React from 'react'
-import YoutubeEmbed from './Youtube'
+
 function About() {
   return (
     <div className="flex mt-40">
