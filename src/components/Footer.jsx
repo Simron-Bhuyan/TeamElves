@@ -5,17 +5,17 @@ function Footer() {
   return (
     <div>
       <footer className=" bg-purple text-white dark:bg-gray-900">
-        <div class="md:flex md:justify-between p-6">
-          <div className="mx-24 mb-4 md:mb-0 md:mt-6">
+        <div class="container-fluid w-full flex flex-wrap items-center sm:justify-around md:justify-between px-6">
+          <div className="mx-10 mb-4 md:mb-16 md:mt-6 md:mx-0">
             <a className="flex items-center h-[40px]">
               <img
                 src="https://user-images.githubusercontent.com/89746011/199548760-e3011cf6-27cb-4a12-aebb-af1faf352175.png"
-                className="h-[14em] md:h-[18rem] mt-8"
+                className="h-[12rem] mt-8"
                 alt="Detecto Logo"
               />
             </a>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3 my-3 sm:pr-6">
+          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3 mb-2 mt-8 sm:pr-6 md:mb-4 md:mt-6">
             <div>
               <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">
                 Resources

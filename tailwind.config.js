@@ -4,6 +4,7 @@ module.exports = {
   ],
   darkmode: false,
   theme: {
+
     extend: {
 
       margin: {
