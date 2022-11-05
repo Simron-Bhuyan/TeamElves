@@ -8,11 +8,11 @@ function Contributors() {
       <div className=" my-24 px-6 mx-auto text-center justify-around items-center">
         <div className="mb-32 text-gray-800 text-center justify-between items-center">
           <div className="grid gap-x-6 lg:gap-x-12 md:grid-cols-5">
-            <MembersCard name={"Martha Smith"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
-            <MembersCard name={"Martha Smith"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
-            <MembersCard name={"Martha Smith"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
-            <MembersCard name={"Martha Smith"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
-            <MembersCard name={"Martha Smith"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
+            <MembersCard name={"Aryan"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
+            <MembersCard name={"Simron Bhuyan"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
+            <MembersCard name={"Khusi Das Mohapatra"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
+            <MembersCard name={"Padmakshi Mandal"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
+            <MembersCard name={"Ipsita Satapathy"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
             {/* <div className="mb-24 md:mb-0">
               <div className="rounded-lg shadow-lg h-full block bg-white">
                 <div className="flex justify-center">
