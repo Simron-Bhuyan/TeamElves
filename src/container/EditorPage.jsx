@@ -22,6 +22,71 @@ const EditorPage = (props) => {
   const handleClick = (event) => {
     hiddenFileInput.current.click();
   };
+
+  var jsonContent={
+    'code':`
+    #User function heyalate for python3
+class Solution:
+    def constructLowerArray(self,arr, n):
+        # code here
+        def merge(a,b):
+            i,j=0,0
+            x,y=len(a),len(b)
+            while i<x:
+                a[i][1]+=j
+                while j<y and a[i][0]>b[j][0]:
+                    j+=1
+                    a[i][1]+=1
+                i+=1
+            i,j=0,0
+            heya=[]
+            while i<x and j<y:
+                if a[i][0]>b[j][0]:
+                    heya.append(b[j])
+                    j+=1
+                else:
+                    heya.append(a[i])
+                    i+=1
+            while i<x:
+                heya.append(a[i])
+                i+=1
+            while j<y:
+                heya.append(b[j])
+                j+=1
+            return heya
+        def mergesort(a):
+            x=len(a)
+            if x<2:
+                return a
+            else:
+                mid=x//2
+                return merge(mergesort(a[:mid]),mergesort(a[mid:]))
+        a=[[arr[i],0,i] for i in range(len(arr))]
+        ans=mergesort(a)
+        ans.sort(key=lambda x: x[2])
+        return list([ans[i][1] for i in range(len(ans))])
+
+
+
+
+
+#{ 
+ # Driver Code Starts
+#Initial heyalate for Python 3
+
+
+
+
+# } Driver Code Ends
+    `
+  }
+  
+    const handleSubmit = (e) => {
+      fetch('http://localhost:5000/api', {
+        method: 'POST',
+        body: JSON.stringify(jsonContent),
+      })
+      };
   // Call a function (passed as a prop from the parent component)
   // to handle the user-selected file
   const handleChange = (event) => {
@@ -52,8 +117,10 @@ const EditorPage = (props) => {
             <Editor />
           </div>
           <div className="buttonContainer mb-10 space-x-4 flex justify-center">
-            <button className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg">
+            <button className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg" onClick={handleSubmit}>
+            <a href="http://localhost:5000/test">
               Submit
+              </a>
             </button>
             <button
               className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg flex items-center"

@@ -8,7 +8,7 @@ const App = () => {
   return (
     <Routes>
         <Route path={"/*"} element={<Home />} />
-        <Route path={"/plagarism-checker"} element={<EditorPage/>} />
+        <Route path={"/plagiarism-checker"} element={<EditorPage/>} />
 
       </Routes>
   )

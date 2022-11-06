@@ -1,0 +1,266 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+
+@keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
+
+body{
+    background-color: antiquewhite;
+    font-family: 'Roboto', sans-serif;
+}
+*{
+    margin: 0px;
+    padding: 0px;
+}
+nav ul{
+    display: flex;
+    align-items: center;
+    height: 50px;
+    list-style-type: none;
+    background-color: black;
+    color: antiquewhite;
+    font-size: 15px;
+}
+nav li{
+    padding: 0px 12px;
+}
+.logo img{
+    width: 40px;
+    padding-right: 10px;
+}
+.logo{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 500;
+    font-size: 18px;
+    padding-right: 15px;
+}
+.container{
+    min-height: 73vh;
+    background-color: rgb(35, 35, 35);
+    color: antiquewhite;
+    display: flex;
+    justify-content: space-evenly;
+    width: 80%;
+    margin: 24px auto;
+    border-radius: 10px;
+    padding: 18px;
+}
+#progress{
+    cursor: pointer;
+    width: 150vh;
+}
+.icons{
+    margin-top: 12px;
+    cursor: pointer;
+    display: flex;
+}
+.song{
+    background-color: antiquewhite;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    width: 60vh;
+    height: 4vh;
+    border-radius: 20px;
+    color: rgb(17, 17, 17);
+    font-weight: 400;
+    font-size: 14px;
+    margin-top: 20px;
+}
+.playsong{
+    cursor: pointer;
+}
+.times{
+    margin: 6px;
+}
+.song img{
+    width: 40px;
+    border-radius: 50px;
+}
+.right{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 8vh 0vh;
+    font-size: 20px;
+}
+.right span{
+    margin: 2vh 0vh;
+}
+.names{
+    font-weight: 700;
+    padding-top: 6vh;
+    font-size: 24px;
+}
+.album{
+    width: 50vh;
+    height: 50vh;
+}
+.curr{
+    position: absolute;
+    left: 24vh;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    top: 4vh;
+}
+.curr img{
+    width: 30px;
+    border-radius: 40px;
+    margin-right: 12px;
+}
+.rotate {
+    animation: rotation 4s infinite linear;
+}
+.bottom{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: antiquewhite;
+    position: sticky;
+    height: 80px;
+    bottom: 0px;
+    background-color: rgb(35, 35, 35);
+}
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+
+@keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
+
+body{
+    background-color: antiquewhite;
+    font-family: 'Roboto', sans-serif;
+}
+*{
+    margin: 0px;
+    padding: 0px;
+}
+nav ul{
+    display: flex;
+    align-items: center;
+    height: 50px;
+    list-style-type: none;
+    background-color: black;
+    color: antiquewhite;
+    font-size: 15px;
+}
+nav li{
+    padding: 0px 12px;
+}
+.logo img{
+    width: 40px;
+    padding-right: 10px;
+}
+.logo{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 500;
+    font-size: 18px;
+    padding-right: 15px;
+}
+.container{
+    min-height: 73vh;
+    background-color: rgb(35, 35, 35);
+    color: antiquewhite;
+    display: flex;
+    justify-content: space-evenly;
+    width: 80%;
+    margin: 24px auto;
+    border-radius: 10px;
+    padding: 18px;
+}
+#progress{
+    cursor: pointer;
+    width: 150vh;
+}
+.icons{
+    margin-top: 12px;
+    cursor: pointer;
+    display: flex;
+}
+.song{
+    background-color: antiquewhite;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    width: 60vh;
+    height: 4vh;
+    border-radius: 20px;
+    color: rgb(17, 17, 17);
+    font-weight: 400;
+    font-size: 14px;
+    margin-top: 20px;
+}
+.playsong{
+    cursor: pointer;
+}
+.times{
+    margin: 6px;
+}
+.song img{
+    width: 40px;
+    border-radius: 50px;
+}
+.right{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 8vh 0vh;
+    font-size: 20px;
+}
+.right span{
+    margin: 2vh 0vh;
+}
+.names{
+    font-weight: 700;
+    padding-top: 6vh;
+    font-size: 24px;
+}
+.album{
+    width: 50vh;
+    height: 50vh;
+}
+.curr{
+    position: absolute;
+    left: 24vh;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    top: 4vh;
+}
+.curr img{
+    width: 30px;
+    border-radius: 40px;
+    margin-right: 12px;
+}
+.rotate {
+    animation: rotation 4s infinite linear;
+}
+.bottom{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: antiquewhite;
+    position: sticky;
+    height: 80px;
+    bottom: 0px;
+    background-color: rgb(35, 35, 35);
+}
