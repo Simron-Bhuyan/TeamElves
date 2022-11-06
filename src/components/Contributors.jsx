@@ -3,7 +3,7 @@ import MembersCard from "./MembersCard";
 
 function Contributors() {
   return (
-    <div className="contributers w-full h-[max-content] mt-14">
+    <div className="contributers w-full h-[max-content] mt-14" id="team">
       <h3 className="font-semibold text-3xl text-center p-10">CONTRIBUTORS</h3>
       <div className=" my-24 px-6 mx-auto text-center justify-around items-center">
         <div className="mb-32 text-gray-800 text-center justify-between items-center">

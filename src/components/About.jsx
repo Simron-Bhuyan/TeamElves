@@ -2,7 +2,7 @@ import React from "react";
 import YoutubeEmbed from "./Youtube";
 function About() {
   return (
-    <div className=" flex-row-reverse md:flex md:mt-40 p-5">
+    <div className=" flex-row-reverse md:flex md:mt-40 p-5" id="about">
       <div className=" flex items-center p-5">
         <div>
           <h3 className="font-bold text-3xl text-center">LOREM</h3>
