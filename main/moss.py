@@ -9,8 +9,12 @@ def hey():
     # m.addBaseFile("test.py")
 
     # Submission Files
-    m.addFile("main/test.py")
-    m.addFile("main/test2.py")
+    m.addFile("test3.py")
+    # m.addFile("venv/main/test2.py")
+    
+    print(os.getcwd()+'\database')
+    for file in os.listdir(os.getcwd()+'/database'):
+        m.addFile(os.getcwd()+'/database/'+file)
 
     # progress function optional, run on every file uploaded
     # result is submission URL
@@ -28,4 +32,4 @@ def hey():
     # on_read function run for every downloaded file
     return url
 
-hey()
+# hey()
