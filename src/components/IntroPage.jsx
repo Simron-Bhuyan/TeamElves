@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom'
 import {BiFastForward} from 'react-icons/bi'
 function IntroPage() {
   return (
-    <div className="hero md:h-[90vh] w-[100vw] md:flex">
+    <div className="hero md:h-[90vh] w-[100vw] md:flex" >
         <div className="heroLeft flex h-[50vh] md:w-[55%] md:h-[100%] justify-center items-center p-7 md:p-20 md:pr-32">
           <div>
             <h3 className="font-bold text-6xl mb-4 text-center md:text-left ">DETECTO</h3>
