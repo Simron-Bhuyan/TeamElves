@@ -1,44 +1,36 @@
-<html>
-<head>
-<title>main/test.py</title>
-</head>
-<body bgcolor="white">
-<hr/>
-main/test.py<p></p><pre>
-#User function heyalate for python3
-<a name="0"></a><font color="#FF0000"><a href="match0-1.html#0" target="1"><img align="left" alt="other" border="0" src="http://moss.stanford.edu/bitmaps/tm_0_98.gif"/></a>
 
+    #User function heyalate for python3
 class Solution:
     def constructLowerArray(self,arr, n):
         # code here
         def merge(a,b):
             i,j=0,0
             x,y=len(a),len(b)
-            while i&lt;x:
+            while i<x:
                 a[i][1]+=j
-                while j&lt;y and a[i][0]&gt;b[j][0]:
+                while j<y and a[i][0]>b[j][0]:
                     j+=1
                     a[i][1]+=1
                 i+=1
             i,j=0,0
             heya=[]
-            while i&lt;x and j&lt;y:
-                if a[i][0]&gt;b[j][0]:
+            while i<x and j<y:
+                if a[i][0]>b[j][0]:
                     heya.append(b[j])
                     j+=1
                 else:
                     heya.append(a[i])
                     i+=1
-            while i&lt;x:
+            while i<x:
                 heya.append(a[i])
                 i+=1
-            while j&lt;y:
+            while j<y:
                 heya.append(b[j])
                 j+=1
             return heya
         def mergesort(a):
             x=len(a)
-            if x&lt;2:
+            if x<2:
                 return a
             else:
                 mid=x//2
@@ -47,7 +39,7 @@ class Solution:
         ans=mergesort(a)
         ans.sort(key=lambda x: x[2])
         return list([ans[i][1] for i in range(len(ans))])
-</font>
+
 
 
 
@@ -59,6 +51,5 @@ class Solution:
 
 
 
-# } Driver Code Ends</pre>
-</body>
-</html>
+# } Driver Code Ends
+    

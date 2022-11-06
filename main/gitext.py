@@ -16,7 +16,7 @@ def search(reponame):
             contents.extend(repo.get_contents(file_content.path))
         else:
             # file_content.save(file_content.name, content, save=True)
-            print(os.path.splitext(file_content.name)[1])
+            # print(os.path.splitext(file_content.name)[1])
             if os.path.splitext(file_content.name)[1][1:] in ext:
                 file=open('database/'+file_content.name,'ab')
                 file.write(b64decode(file_content.content))
