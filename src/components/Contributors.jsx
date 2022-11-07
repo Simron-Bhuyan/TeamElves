@@ -1,4 +1,5 @@
  import React from "react";
+import { useHref } from "react-router-dom";
 import MembersCard from "./MembersCard";
 
 function Contributors() {
@@ -8,11 +9,11 @@ function Contributors() {
       <div className=" my-24 px-6 mx-auto text-center justify-around items-center">
         <div className="mb-32 text-gray-800 text-center justify-between items-center">
           <div className="grid gap-x-6 lg:gap-x-12 md:grid-cols-5">
-            <MembersCard name={"Aryan"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
-            <MembersCard name={"Simron Bhuyan"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
-            <MembersCard name={"Khusi Das Mohapatra"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
-            <MembersCard name={"Padmakshi Mandal"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
-            <MembersCard name={"Ipsita Satapathy"} role={"Frontend Developer"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}/>
+            <MembersCard name={"Aryan"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"} gitUrl={ "https://github.com/SwiftFox1839"} LinkedIn={" https://www.linkedin.com/in/aryan-a3115b256/"} mail={"aryanisme2003@gmail.com"}/>
+            <MembersCard name={"Simron Bhuyan"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}gitUrl={"https://github.com/Simron-Bhuyan"} LinkedIn={"https://www.linkedin.com/in/simron-bhuyan-856b73205/"} mail={"simron0707@gmail.com"}/>
+            <MembersCard name={"Khusi Das Mohapatra"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}gitUrl={"https://github.com/Khusidm"} LinkedIn={"https://www.linkedin.com/in/khusi-das-mohapatra-058652235"} mail={"khusidasm7@gmail.com"}/>
+            <MembersCard name={"Padmakshi Mandal"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}gitUrl={"https://github.com/padmakshimandal"} LinkedIn={"https://www.linkedin.com/in/padmakshi-mandal-a59466202/"} mail={"padmakshi.mandal@gmail.com"}/>
+            <MembersCard name={"Ipsita Satapathy"} imgUrl={"https://mdbootstrap.com/img/new/avatars/6.jpg"}gitUrl={"https://github.com/ipsitasatapathy"} LinkedIn={"https://www.linkedin.com/in/ipsita-satapathy-788509210"} mail={"ipshu.satapathy@gmail.com"}/>
             {/* <div className="mb-24 md:mb-0">
               <div className="rounded-lg shadow-lg h-full block bg-white">
                 <div className="flex justify-center">
