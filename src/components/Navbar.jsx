@@ -6,7 +6,7 @@ import { Link } from 'react-scroll'
 
 function Navbar(props) {
   return (
-    <nav className="relative w-full flex flex-wrap items-center justify-between py-4 bg-purple navbar navbar-expand-lg navbar-light">
+    <nav className=" relative w-full flex flex-wrap items-center justify-between py-4 bg-purple navbar navbar-expand-lg navbar-light">
       <div className="container-fluid w-full flex flex-wrap items-center sm:justify-around md:justify-between px-6">
       <div className="flex flex-wrap ">
         <h1 className={props.darkMode ? "text-neutral-900 font-semibold text-lg" : "text-stone-50 font-semibold text-lg"} >

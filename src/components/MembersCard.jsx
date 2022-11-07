@@ -1,6 +1,6 @@
 import React from "react";
 
-const MembersCard = ({ name, role, imgUrl, gitUrl,LinkedIn,mail}) => {
+const MembersCard = ({ name, imgUrl, gitUrl,LinkedIn,mail}) => {
   return (
     <div className="mb-24 md:mb-0">
       <div className="rounded-lg shadow-lg h-full block bg-white">
@@ -16,9 +16,8 @@ const MembersCard = ({ name, role, imgUrl, gitUrl,LinkedIn,mail}) => {
         </div>
         <div className="p-6">
           <h5 className="text-lg font-bold mb-4">{name}</h5>
-          <p className="mb-6">{role}</p>
           <ul className="list-inside flex mx-auto justify-center">
-            <a href="#!" className="px-2">
+            <a href={gitUrl} className="git px-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 496 512"
@@ -30,7 +29,7 @@ const MembersCard = ({ name, role, imgUrl, gitUrl,LinkedIn,mail}) => {
                 />
               </svg>
             </a>
-            <a href="#!" className="px-2">
+            <a href={mail} className="twitter px-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
@@ -42,7 +41,7 @@ const MembersCard = ({ name, role, imgUrl, gitUrl,LinkedIn,mail}) => {
                 />
               </svg>
             </a>
-            <a href="#!" className="px-2">
+            <a href={LinkedIn} className=" linkedin px-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 448 512"
