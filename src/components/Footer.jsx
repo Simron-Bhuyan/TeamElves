@@ -4,7 +4,7 @@ import "../Stylesheets/Colours.css";
 function Footer() {
   return (
     <div>
-      <footer className=" bg-purple text-white dark:bg-gray-900">
+      <footer className=" bg-purple text-white dark:bg-gray-900 ">
         <div class="container-fluid w-full flex flex-wrap items-center sm:justify-around md:justify-between px-6">
           <div className="mx-10 mb-4 md:mb-16 md:mt-6 md:mx-0">
             <a className="flex items-center h-[40px]">

@@ -7,7 +7,7 @@ import { Link } from 'react-scroll'
 function Navbar(props) {
   return (
     <nav className=" relative w-full flex flex-wrap items-center justify-between py-4 bg-purple navbar navbar-expand-lg navbar-light">
-      <div className="container-fluid w-full flex flex-wrap items-center sm:justify-around md:justify-between px-6">
+      <div className="container-fluid w-full flex flex-wrap items-center sm:justify-around md:justify-between px-6 ">
       <div className="flex flex-wrap ">
         <h1 className={props.darkMode ? "text-neutral-900 font-semibold text-lg" : "text-stone-50 font-semibold text-lg"} >
         <a className="flex items-center h-[28px] my-2 mx-24 mb-4 md:my-1 md:ml-2">
@@ -29,7 +29,7 @@ function Navbar(props) {
         </div>
         <a className="flex self-left justify-self-center px-2 cursor-pointer hover:text-[#f5d7f5] duration-500" href="https://github.com/Simron-Bhuyan/TeamElves">Github <BsBoxArrowInUpRight className="ustify-self-center" /></a>
         <div className="self-left justify-self-center px-2 cursor-pointer hover:text-[#f5d7f5] duration-500">
-        <Link to="team" spy={true} smooth={true} offset={-50} duration={500}>
+        <Link to="team" spy={true} smooth={true} offset={-50} duration={1000}>
         Team
         </Link>
         </div>
