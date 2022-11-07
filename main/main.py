@@ -1,18 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from moss import hey
-import datetime
-import os
+# import datetime
+# import os
 import json
 
   
-x = datetime.datetime.now()
-  
-# Initializing flask app
-app = Flask(__name__)
+# x = datetime.datetime.now()
   
 app = Flask(__name__)
-app.static_folder='static'
+# app.static_folder='static'
 CORS(app)
 
 data={'code':'inside test3'}
@@ -36,10 +33,10 @@ def test():
     # url='ok'
     return {"URL":url}
       
-@app.route('/okay')
-def okay():
-    # url=hey()
-    return {"URL":"YES"}
+# @app.route('/okay')
+# def okay():
+#     # url=hey()
+#     return {"URL":"YES"}
 
 
 
