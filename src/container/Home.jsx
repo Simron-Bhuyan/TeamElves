@@ -8,7 +8,7 @@ import Tech from '../components/Tech'
 import Contributors from '../components/Contributors'
 import Footer from '../components/Footer'
 function Home() {
-  const [darkMode, toggleDarkMode] = useState(true)
+  const [darkMode, toggleDarkMode] = useState(false)
   const [isLoding, setIsLoding] = useState(true);
   useEffect(() => {
     setTimeout(() => {

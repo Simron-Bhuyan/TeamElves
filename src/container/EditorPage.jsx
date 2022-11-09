@@ -12,8 +12,9 @@ import Editor from "../components/Editor";
 import WithLineNumbers from "../components/WithLineNumbers";
 
 const EditorPage = (props) => {
-  const [darkMode, toggleDarkMode] = useState(true);
-  const [result, setResult] = useState(true);
+  const [darkMode, toggleDarkMode] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(false)
+  const result=false;
   // Create a reference to the hidden file input element
   const hiddenFileInput = React.useRef(null);
 
@@ -90,8 +91,8 @@ class Solution:
   // Call a function (passed as a prop from the parent component)
   // to handle the user-selected file
   const handleChange = (event) => {
-    const fileUploaded = event.target.files[0];
-    console.log(fileUploaded)
+    const fileUploaded= event.target.files;
+    console.log(fileUploaded);
     props.handleFile(fileUploaded);
   };
   return (
@@ -113,15 +114,27 @@ class Solution:
       </div>
       <div className=" flex justify-center min-h-[45vh]">
         <div className="leftEditor w-[50%]">
-          <div className="m-3 shadow-md shadow-slate-600">
+          <div className={`m-3 shadow-md shadow-slate-600 ${isUploaded? "hidden" : "block"}`}>
             <Editor />
           </div>
+          <div className={`m-3 ${isUploaded? "block" : "hidden"} flex justify-center`}>
+            <div className="fileName m-2 border-black border 2 px-10 py-5 rounded-sm flex">
+              <div>
+                FileName isUploaded
+              </div>
+              <div className="ml-6">
+                <button>
+                  X
+                </button>
+              </div>
+            </div>
+          </div>
           <div className="buttonContainer mb-10 space-x-4 flex justify-center">
-            <button className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg" onClick={handleSubmit}>
+            {/* <button className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg" onClick={handleSubmit}>
             <a href="http://localhost:5000/test">
               Submit
               </a>
-            </button>
+            </button> */}
             <button
               className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg flex items-center"
               onClick={handleClick}
@@ -134,6 +147,7 @@ class Solution:
               ref={hiddenFileInput}
               onChange={handleChange}
               style={{ display: "none" }}
+              multiple
             />
           </div>
         </div>
