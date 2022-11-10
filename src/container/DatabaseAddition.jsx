@@ -2,14 +2,26 @@ import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { BACKEND_URL } from "../URLConfig";
-import { ToastContainer, toast } from 'react-toastify';
-  import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const DatabaseAddition = () => {
+const DatabaseAddition = (props) => {
   const [darkMode, toggleDarkMode] = useState(false);
   const [repoName, setRepoName] = useState("");
   const [loading, setLoading] = useState(false);
   const postRepoName = () => {
+    if (repoName === "") {
+      return toast.error("Please Enter Repo name", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: `${darkMode ? "dark" : "light"}`,
+      });
+    }
     setLoading(true);
     fetch(`${BACKEND_URL}/github`, {
       method: "POST",
@@ -25,34 +37,23 @@ const DatabaseAddition = () => {
         res.json();
         setLoading(false);
         setRepoName("");
-        toast.success('Successfully Added to Database !', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: `${darkMode ? "dark" : "light"}`,
-            });
+        toast.success("Successfully Added to Database !", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: `${darkMode ? "dark" : "light"}`,
+        });
       })
       .then((data) => {
         console.log(data);
-        toast.success('Something Went Wrong!', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: `${darkMode ? "dark" : "light"}`,
-            });
-        setLoading(false);
       });
   };
   return (
-    <div>
+    <div className={`w-[100vw] ${darkMode ? "dark" : "light"}`} >
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <div className="page h-[75vh] mx-10  flex justify-center items-center">
         <div

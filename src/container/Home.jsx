@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react'
-// import {Link} from 'react-router-dom'
 import Spinner from '../components/Spinner'
 import Navbar from '../components/Navbar'
 import IntroPage from '../components/IntroPage'
 import About from '../components/About'
-import Tech from '../components/Tech'
 import Contributors from '../components/Contributors'
 import Footer from '../components/Footer'
 function Home() {
@@ -27,7 +25,6 @@ function Home() {
         />
         <IntroPage />
         <About />
-        <Tech />
         <Contributors />
         <Footer />
       </div>)}

@@ -14,6 +14,8 @@ import theme from "prism-react-renderer/themes/nightOwl";
 import WithLineNumbers from "../components/WithLineNumbers";
 import { BACKEND_URL } from "../URLConfig";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // import Editor from "../components/Editor";
 
 const exampleCode = `
@@ -62,43 +64,53 @@ const EditorPage = (props) => {
   );
 
   const handleSubmit = (e) => {
-    console.log(code);
+    if (code === "") {
+      return toast.error("Please Enter Repo name", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: `${darkMode ? "dark" : "light"}`,
+      });
+    }
     setIsLoading(true);
     const jsonContent = {
       code: code,
     };
-    fetch(`${BACKEND_URL}/code`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(jsonContent),
-    })
+    axios
+      .post(`${BACKEND_URL}/code`, jsonContent)
       .then((res) => {
-        res.json();
-        console.log(res);
+        console.log(res.data);
+        setResults(res.data);
         setIsLoading(false);
+        setIsResult(true);
+        localStorage.setItem("result", JSON.stringify(res.data.res));
         navigate("/result");
       })
-      .then((data) => {
-        console.log(data);
-        setIsLoading(false);
+      .catch((err) => {
+        console.log(err);
       });
   };
+
   const handleChange = (event) => {
     const fileUploaded = event.target.files[0];
     console.log(fileUploaded);
+    setIsLoading(true);
     const formData = new FormData();
     formData.append("file", fileUploaded);
     axios
       .post(`${BACKEND_URL}/upload`, formData)
       .then((res) => {
         console.log(res);
-        localStorage.setItem("result", res.data);
-        navigate("/resultPage");
+        localStorage.setItem("result", JSON.stringify(res.data.res));
+        navigate("/result");
       })
       .catch((err) => {
         console.log(err);
+        setIsLoading(false);
       });
     props.handleFile(fileUploaded);
   };
@@ -155,13 +167,29 @@ const EditorPage = (props) => {
             />
           </div>
         </div>
-        <div className={` ${isLoading ? "flex" : "hidden"} justify-center items-center`}>
+        <div
+          className={` ${
+            isLoading ? "flex" : "hidden"
+          } justify-center items-center`}
+        >
           <div>
             <h3 className="text-2xl font-bold">Loading...</h3>
           </div>
         </div>
       </div>
       <Footer />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={darkMode ? "dark" : "light"}
+      />
     </div>
   );
 };
