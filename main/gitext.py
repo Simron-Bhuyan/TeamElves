@@ -2,10 +2,8 @@ from github import Github
 from base64 import b64decode
 import os
 
-g = Github("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")
-ext=['html','py','cpp','c','jsx','css','js']
-
-reponame=("DivyeNegi/spotify-clone")
+g = Github("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")
+ext=['cpp']
 
 def search(reponame):
     repo = g.get_repo(reponame)
@@ -22,5 +20,3 @@ def search(reponame):
                 file.write(b64decode(file_content.content))
                 file.close() 
                 print(file_content.name+' done')
-
-search(reponame)
