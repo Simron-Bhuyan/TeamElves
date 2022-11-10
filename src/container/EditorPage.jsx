@@ -4,7 +4,7 @@ import AceEditor from "react-ace";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { FaUpload } from "react-icons/fa";
-
+import { useNavigate } from "react-router-dom";
 import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/ext-language_tools";
@@ -14,10 +14,11 @@ import WithLineNumbers from "../components/WithLineNumbers";
 const EditorPage = (props) => {
   const [darkMode, toggleDarkMode] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false)
-  const result=false;
+  const [isResult, setIsResult] = useState(false)
+  const [code, setCode] = useState("")
   // Create a reference to the hidden file input element
   const hiddenFileInput = React.useRef(null);
-
+  const navigate = useNavigate();
   // Programatically click the hidden file input element
   // when the Button component is clicked
   const handleClick = (event) => {
@@ -66,11 +67,6 @@ class Solution:
         ans=mergesort(a)
         ans.sort(key=lambda x: x[2])
         return list([ans[i][1] for i in range(len(ans))])
-
-
-
-
-
 #{ 
  # Driver Code Starts
 #Initial heyalate for Python 3
@@ -81,17 +77,25 @@ class Solution:
 # } Driver Code Ends
     `
   }
-  
     const handleSubmit = (e) => {
-      fetch('http://localhost:5000/api', {
-        method: 'POST',
-        body: JSON.stringify(jsonContent),
-      })
+      navigate("/result");
+      // fetch("http://localhost:5000/api", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(jsonContent),
+      // })
+      //   .then((res) => res.json())
+      //   .then((data) => {
+      //     console.log(data);
+      //   }
+      //   );
       };
   // Call a function (passed as a prop from the parent component)
   // to handle the user-selected file
   const handleChange = (event) => {
-    const fileUploaded= event.target.files;
+    const fileUploaded= event.target.files[0];
     console.log(fileUploaded);
     props.handleFile(fileUploaded);
   };
@@ -130,11 +134,9 @@ class Solution:
             </div>
           </div>
           <div className="buttonContainer mb-10 space-x-4 flex justify-center">
-            {/* <button className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg" onClick={handleSubmit}>
-            <a href="http://localhost:5000/test">
+            <button className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg" onClick={handleSubmit}>
               Submit
-              </a>
-            </button> */}
+            </button>
             <button
               className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg flex items-center"
               onClick={handleClick}
@@ -151,13 +153,12 @@ class Solution:
             />
           </div>
         </div>
-        <div className={`rightOutput w-[50%] ${result ? "flex" : "hidden"}`}>
+        <div className={`rightOutput w-[50%] ${isResult ? "flex" : "hidden"}`}>
           <div>
             <h3 className="items-center">RESULT</h3>
           </div>
         </div>
       </div>
-
       <Footer />
     </div>
   );
