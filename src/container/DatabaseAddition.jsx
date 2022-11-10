@@ -5,11 +5,16 @@ import { BACKEND_URL } from "../URLConfig";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const removeSpaces = (str) => {
+  return str.replace(/\s/g, "");
+}
+
 const DatabaseAddition = (props) => {
   const [darkMode, toggleDarkMode] = useState(false);
   const [repoName, setRepoName] = useState("");
   const [loading, setLoading] = useState(false);
   const postRepoName = () => {
+    setRepoName(removeSpaces(repoName));
     if (repoName === "") {
       return toast.error("Please Enter Repo name", {
         position: "top-right",
