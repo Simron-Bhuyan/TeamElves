@@ -121,8 +121,9 @@ class Solution:
           <div className="m-3 shadow-md shadow-slate-600">
             <Editor />
           </div>
-          <div className="buttonContainer mb-10 space-x-4 flex justify-center">
-            <button className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg" onClick={handleSubmit}>
+          <form action = "http://127.0.0.1:6000/upload" method = "POST" 
+          enctype = "multipart/form-data" className="buttonContainer mb-10 space-x-4 flex justify-center">
+            <button className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg" onClick={handleSubmit}>Submit
             </button>
             <button
               className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg flex items-center"
@@ -131,13 +132,15 @@ class Solution:
               Upload file
               <FaUpload className="text-lg mx-1 " />
             </button>
-            <input
+            <input name = "selectedFile"
               id="file"
               type="file"
               onChange={handleFileSelect}
               style={{ display: "none" }}
             />
-          </div>
+          </form>
+
+
         </div>
         <div className={`rightOutput w-[50%] ${result ? "flex" : "hidden"}`}>
           <div>
