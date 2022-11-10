@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { BACKEND_URL } from "../URLConfig";
 
 const Result = () => {
   const [darkMode, toggleDarkMode] = useState(false);
+  const [result, setResult] = useState([]);
+  useEffect(() => {
+    var data = localStorage.getItem("result");
+    setResult(JSON.parse(data));
+  },[]);
   const results = [
     {
       fileName: "file1.java",
