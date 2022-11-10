@@ -65,7 +65,7 @@ const EditorPage = (props) => {
 
   const handleSubmit = (e) => {
     if (code === "") {
-      return toast.error("Please Enter Repo name", {
+      return toast.error("Please Enter some code", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -133,18 +133,7 @@ const EditorPage = (props) => {
               style={styles.root}
             />
           </div>
-          {/* <div
-            className={`m-3 ${
-              isUploaded ? "block" : "hidden"
-            } flex justify-center`}
-          >
-            <div className="fileName m-2 border-black border 2 px-10 py-5 rounded-sm flex">
-              <div>FileName isUploaded</div>
-              <div className="ml-6">
-                <button>X</button>
-              </div>
-            </div>
-          </div> */}
+         
           <div className="buttonContainer mb-10 space-x-4 flex justify-center">
             <button
               className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg"
