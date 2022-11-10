@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { BACKEND_URL } from "../URLConfig";
+import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 
 const DatabaseAddition = () => {
   const [darkMode, toggleDarkMode] = useState(false);
@@ -18,19 +20,52 @@ const DatabaseAddition = () => {
         repo: repoName,
       }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        res.json();
+        setLoading(false);
+        setRepoName("");
+        toast.success('Successfully Added to Database !', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: `${darkMode ? "dark" : "light"}`,
+            });
+      })
       .then((data) => {
         console.log(data);
+        toast.success('Something Went Wrong!', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: `${darkMode ? "dark" : "light"}`,
+            });
+        setLoading(false);
       });
   };
   return (
     <div>
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <div className="page h-[75vh] mx-10  flex justify-center items-center">
-        <div className={`w-[90vw] sm:w-[60vw] flex-column space-y-2 ${loading?"hidden":"block"}`}>
-          <h3 className="font-bold text-2xl" >Add New Repository to the database</h3>
+        <div
+          className={`w-[90vw] sm:w-[60vw] flex-column space-y-2 ${
+            loading ? "hidden" : "block"
+          }`}
+        >
+          <h3 className="font-bold text-2xl">
+            Add New Repository to the database
+          </h3>
           <p>
-            Enter a Repository name in the format username/reponame to add it to the database
+            Enter a Repository name in the format username/reponame to add it to
+            the database
           </p>
           <div>
             <div className="flex space-x-4 mt-4">
@@ -50,12 +85,29 @@ const DatabaseAddition = () => {
             </div>
           </div>
         </div>
-        <div className={`w-[90vw] sm:w-[60vw] flex justify-center ${loading?"block":"hidden"}`}>
-            <h3 className="font-bold text-2xl text-center" >Adding Repository to Database ...</h3>
+        <div
+          className={`w-[90vw] sm:w-[60vw] flex justify-center ${
+            loading ? "block" : "hidden"
+          }`}
+        >
+          <h3 className="font-bold text-2xl text-center">
+            Adding Repository to Database ...
+          </h3>
         </div>
       </div>
-
       <Footer />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={darkMode ? "dark" : "light"}
+      />
     </div>
   );
 };

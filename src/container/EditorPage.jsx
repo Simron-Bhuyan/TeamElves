@@ -63,11 +63,11 @@ const EditorPage = (props) => {
 
   const handleSubmit = (e) => {
     console.log(code);
+    setIsLoading(true);
     const jsonContent = {
       code: code,
     };
-
-    fetch(`${BACKEND_URL}/api`, {
+    fetch(`${BACKEND_URL}/code`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -77,13 +77,14 @@ const EditorPage = (props) => {
       .then((res) => {
         res.json();
         console.log(res);
+        setIsLoading(false);
+        navigate("/result");
       })
       .then((data) => {
         console.log(data);
+        setIsLoading(false);
       });
   };
-  // Call a function (passed as a prop from the parent component)
-  // to handle the user-selected file
   const handleChange = (event) => {
     const fileUploaded = event.target.files[0];
     console.log(fileUploaded);
@@ -106,7 +107,7 @@ const EditorPage = (props) => {
     <div className={`w-[100vw] ${darkMode ? "dark" : "light"}`}>
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <div className={` flex justify-center min-h-[65vh] items-center `}>
-        <div className="leftEditor w-[50%]">
+        <div className={`leftEditor w-[50%] ${isLoading ? "hidden" : "block"}`}>
           <div
             className={`m-3 shadow-md shadow-slate-600 ${
               isUploaded ? "hidden" : "block"
@@ -120,7 +121,7 @@ const EditorPage = (props) => {
               style={styles.root}
             />
           </div>
-          <div
+          {/* <div
             className={`m-3 ${
               isUploaded ? "block" : "hidden"
             } flex justify-center`}
@@ -131,7 +132,7 @@ const EditorPage = (props) => {
                 <button>X</button>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="buttonContainer mb-10 space-x-4 flex justify-center">
             <button
               className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg"
@@ -151,13 +152,12 @@ const EditorPage = (props) => {
               ref={hiddenFileInput}
               onChange={handleChange}
               style={{ display: "none" }}
-              multiple
             />
           </div>
         </div>
-        <div className={`rightOutput w-[50%] ${isResult ? "flex" : "hidden"}`}>
+        <div className={` ${isLoading ? "flex" : "hidden"} justify-center items-center`}>
           <div>
-            <h3 className="items-center">RESULT</h3>
+            <h3 className="text-2xl font-bold">Loading...</h3>
           </div>
         </div>
       </div>
