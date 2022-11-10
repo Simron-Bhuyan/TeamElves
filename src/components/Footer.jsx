@@ -15,7 +15,7 @@ function Footer() {
               />
             </a>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3 mb-2 mt-8 sm:pr-6 md:mb-4 md:mt-6">
+          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-2 mb-2 mt-8 sm:pr-1 md:mb-4 md:mt-6">
             <div>
               <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">
                 Resources
@@ -23,7 +23,7 @@ function Footer() {
               <ul className="text-white dark:text-white">
                 <li className="mb-4">
                   <a href="https://flowbite.com/" className="hover:underline">
-                    Lorem ipsum
+                    Python Libraries
                   </a>
                 </li>
                 <li>
@@ -31,7 +31,7 @@ function Footer() {
                     href="https://tailwindcss.com/"
                     className="hover:underline"
                   >
-                    Lorem, ipsum.
+                    CSS Tailwind
                   </a>
                 </li>
               </ul>
@@ -43,7 +43,7 @@ function Footer() {
               <ul className="text-white dark:text-white">
                 <li className="mb-4">
                   <a
-                    href="https://github.com/themesberg/flowbite"
+                    href="https://github.com/Simron-Bhuyan/TeamElves"
                     className="hover:underline "
                   >
                     Github
@@ -59,7 +59,7 @@ function Footer() {
                 </li>
               </ul>
             </div>
-            <div>
+            {/* <div>
               <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">
                 Legal
               </h2>
@@ -75,7 +75,7 @@ function Footer() {
                   </a>
                 </li>
               </ul>
-            </div>
+            </div> */}
           </div>
         </div>
         {/* <h2 className="my-6 border-gray-200 text-white sm:mx-auto dark:border-gray-700 lg:my-8">Legal</h2> */}

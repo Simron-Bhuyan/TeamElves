@@ -7,11 +7,9 @@ function IntroPage() {
         <div className="heroLeft flex h-[50vh] md:w-[55%] md:h-[100%] justify-center items-center p-7 md:p-20 md:pr-32">
           <div>
             <h3 className="font-bold text-6xl mb-4 text-center md:text-left ">DETECTO</h3>
+            <h4 className='font-medium text-xl mb-4 text-center md:text-left '>OPEN SOURCE RISK-ASSESSMENT/CODE PLAGIARISM</h4>
             <p className="text-lg font-medium mb-5">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis
-              voluptatum voluptate illo, delectus officia obcaecati unde
-              nesciunt magnam a neque, nihil non impedit. Deserunt, quas. Natus
-              eos nemo culpa explicabo.
+            Check the similarity of two source codes and view how much percentage matches.Investigate potential copied code by highlighting similarities from submitted peers.It is a smart way to ensure code originality, protect a developer's hardwork and prevent academic dishonesty.
             </p>
             <div className='flex justify-center md:justify-start'>
             <button className="px-4 py-2 bg-[#a74b94] rounded-3xl text-white">

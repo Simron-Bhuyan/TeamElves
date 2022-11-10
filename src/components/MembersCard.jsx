@@ -17,7 +17,7 @@ const MembersCard = ({ name, imgUrl, gitUrl,LinkedIn}) => {
         <div className="p-6">
           <h5 className="text-lg font-bold mb-4">{name}</h5>
           <ul className="list-inside flex mx-auto justify-center">
-            <a href={gitUrl} className="git px-2">
+            <a href={gitUrl} target="_blank" className="git px-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 496 512"
@@ -41,7 +41,7 @@ const MembersCard = ({ name, imgUrl, gitUrl,LinkedIn}) => {
                 />
               </svg>
             </a> */}
-            <a href={LinkedIn} className=" linkedin px-2">
+            <a href={LinkedIn} target="_blank" className=" linkedin px-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 448 512"

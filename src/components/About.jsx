@@ -5,13 +5,13 @@ function About() {
     <div className=" flex-row-reverse md:flex md:mt-40 p-5" id="about">
       <div className=" flex items-center p-5">
         <div>
-          <h3 className="font-bold text-3xl text-center">LOREM</h3>
+          <h3 className="font-bold text-3xl text-center">
+            Detect it with Detecto
+          </h3>
           <p className="text-lg text-center">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam
-            repellat fugiat sit minus, dignissimos, corrupti nisi fugit
-            explicabo modi obcaecati voluptates aut accusantium totam accusamus
-            quae, consequuntur dolore quo earum? Eum nemo nulla omnis
-            recusandae.
+            Detecto allows you to investigate any suspicious cases of code plagiarism,
+            allowing you to conclude with certainty if portion of code is
+            copied.  
           </p>
         </div>
       </div>

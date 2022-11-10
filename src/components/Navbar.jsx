@@ -1,7 +1,7 @@
 import React from 'react'
 import '../Stylesheets/Colours.css'
 import { BsFillSunFill, BsMoonStarsFill, BsBoxArrowInUpRight } from 'react-icons/bs'
-// import { Link } from 'react-router-dom'
+import { Link as Link1 } from 'react-router-dom'
 import { Link } from 'react-scroll'
 
 function Navbar(props) {
@@ -11,13 +11,13 @@ function Navbar(props) {
       <div className="flex flex-wrap ">
         <h1 className={props.darkMode ? "text-neutral-900 font-semibold text-lg" : "text-stone-50 font-semibold text-lg"} >
         <a className="flex items-center h-[28px] my-2 mx-24 mb-4 md:my-1 md:ml-2">
-         {/* <Link to="/intro"> */}
+         <Link1 to="/intro">
          {
             props.darkMode ? 
             <img src="https://user-images.githubusercontent.com/89746011/200042768-4ce65221-00ea-4e4b-af89-5c243bc64f3a.png" className="h-[10rem]" alt="Detecto Logo" /> :
             <img src="https://user-images.githubusercontent.com/89746011/199548760-e3011cf6-27cb-4a12-aebb-af1faf352175.png" className="h-[10rem]" alt="Detecto Logo" /> 
           } 
-         {/* </Link> */}
+         </Link1>
           </a> 
         </h1>
       </div>

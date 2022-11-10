@@ -99,7 +99,7 @@ class Solution:
     <div className={`w-[100vw] ${darkMode ? "dark" : "light"}`}>
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       {/* <WithLineNumbers /> */}
-      <div>
+      {/* <div>
         <h3 className="font-bold text-2xl text-center mt-4 mb-2">
           Code Editor
         </h3>
@@ -111,8 +111,8 @@ class Solution:
           ipsam vero earum. Perferendis nostrum modi hic eligendi eius autem et
           delectus illum.
         </p>
-      </div>
-      <div className=" flex justify-center min-h-[45vh]">
+      </div> */}
+      <div className=" flex justify-center min-h-[65vh] items-center">
         <div className="leftEditor w-[50%]">
           <div className={`m-3 shadow-md shadow-slate-600 ${isUploaded? "hidden" : "block"}`}>
             <Editor />
