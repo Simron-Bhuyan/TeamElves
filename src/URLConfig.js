@@ -1,1 +1,1 @@
-export const BACKEND_URL = "https://b44b-223-176-101-131.in.ngrok.io"
+export const BACKEND_URL = "https://dn-dell.herokuapp.com"
