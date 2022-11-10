@@ -6,7 +6,7 @@ function FileInput() {
         if (file != null) {
             const data = new FormData();
             data.append('file_from_react', file);
-            
+
             let response = await fetch('/url_route', { method: 'post', body: data, });
 
             let res = await response.json();
@@ -17,10 +17,10 @@ function FileInput() {
     };
     return (
         <div>
-        <form> Input files
-        <input type="file" onChange={this.uploadFile}> 
-        </input>
-        </form>
+            <form> Input files
+                <input type="file" onChange={this.uploadFile}>
+                </input>
+            </form>
         </div>
     )
 }

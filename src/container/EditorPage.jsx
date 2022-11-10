@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { render } from "react-dom";
-import AceEditor from "react-ace";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { FaUpload } from "react-icons/fa";
@@ -10,7 +8,6 @@ import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/ext-language_tools";
 import Editor from "../components/Editor";
-import WithLineNumbers from "../components/WithLineNumbers";
 
 const EditorPage = (props) => {
   const [darkMode, toggleDarkMode] = useState(true);
@@ -25,70 +22,12 @@ const EditorPage = (props) => {
   };
   const [selectedFile, setSelectedFile] = useState(null);
 
-  var jsonContent={
-    'code':`
-    #User function heyalate for python3
-class Solution:
-    def constructLowerArray(self,arr, n):
-        # code here
-        def merge(a,b):
-            i,j=0,0
-            x,y=len(a),len(b)
-            while i<x:
-                a[i][1]+=j
-                while j<y and a[i][0]>b[j][0]:
-                    j+=1
-                    a[i][1]+=1
-                i+=1
-            i,j=0,0
-            heya=[]
-            while i<x and j<y:
-                if a[i][0]>b[j][0]:
-                    heya.append(b[j])
-                    j+=1
-                else:
-                    heya.append(a[i])
-                    i+=1
-            while i<x:
-                heya.append(a[i])
-                i+=1
-            while j<y:
-                heya.append(b[j])
-                j+=1
-            return heya
-        def mergesort(a):
-            x=len(a)
-            if x<2:
-                return a
-            else:
-                mid=x//2
-                return merge(mergesort(a[:mid]),mergesort(a[mid:]))
-        a=[[arr[i],0,i] for i in range(len(arr))]
-        ans=mergesort(a)
-        ans.sort(key=lambda x: x[2])
-        return list([ans[i][1] for i in range(len(ans))])
-
-
-
-
-
-#{ 
- # Driver Code Starts
-#Initial heyalate for Python 3
-
-
-
-
-# } Driver Code Ends
-    `
-  }
-  
-    const handleSubmit = async () => {
-      const formData = new FormData();
+  const handleSubmit = async () => {
+    const formData = new FormData();
     formData.append("selectedFile", selectedFile);
-      await axios.post('/upload', formData).then(res => console.log(res))
+    await axios.post('/upload', formData).then(res => console.log(res))
       .catch(err => console.log(err))
-      };
+  };
   // Call a function (passed as a prop from the parent component)
   // to handle the user-selected file
   const handleFileSelect = (event) => {
@@ -121,8 +60,8 @@ class Solution:
           <div className="m-3 shadow-md shadow-slate-600">
             <Editor />
           </div>
-          <form action = "http://127.0.0.1:6000/upload" method = "POST" 
-          enctype = "multipart/form-data" className="buttonContainer mb-10 space-x-4 flex justify-center">
+          <form action="http://127.0.0.1:6000/upload" method="POST"
+            enctype="multipart/form-data" className="buttonContainer mb-10 space-x-4 flex justify-center">
             <button className="px-4 py-1 rounded-md border-2 border-[#a74b94] hover:bg-[#a74b94] hover:text-white duration-150 text-lg" onClick={handleSubmit}>Submit
             </button>
             <button
@@ -132,7 +71,7 @@ class Solution:
               Upload file
               <FaUpload className="text-lg mx-1 " />
             </button>
-            <input name = "selectedFile"
+            <input name="selectedFile"
               id="file"
               type="file"
               onChange={handleFileSelect}
