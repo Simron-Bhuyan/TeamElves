@@ -57,8 +57,8 @@ def keep_words(tokens, keep_tokens):
             tokens.remove(word)
     return tokens
 
-# Result = []
-def getResults(fileName, Result):
+Result = []
+def getResults(fileName):
     myfile1 = open('file.txt', 'r')
     myfile2 = open('database/'+fileName, 'r')
     file1 = open('B1.cpp','w')
@@ -114,32 +114,32 @@ def getResults(fileName, Result):
     finalans=sm.ratio()*100
     finalans=round(finalans,2)
     Result.append((fileName, finalans))
-    print(fileName, finalans,Result)
+    # print(fileName, finalans,Result)
 
-def loopAllFiles(Result):
-    print("Cece")
+def loopAllFiles():
+    # print("Cece")
     for file in os.listdir(os.getcwd()+'/database'):
-        print(file)
-        getResults(file, Result)
+        # print(file)
+        getResults(file)
 
 ###############################################################
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
   if request.method == 'POST':
-    #   global Result
+      global Result
       f = request.files['file']
       print(f)
       f.save(secure_filename('file.txt'))
       Result = []
-      loopAllFiles(Result)
+      loopAllFiles()
       print(Result)
       return jsonify({'res': Result, 'status': True})
   return jsonify({'res': 'Failed To Upload', 'status': False})
 
 @app.route('/code', methods=['GET', 'POST'])
 def code():
-    # global Result
+    global Result
     data = request.data.decode('utf-8')
     codeData = json.loads(data)['code']
     print(codeData)
@@ -148,7 +148,7 @@ def code():
         file.write(codeData)
         file.close()
         Result = []
-        loopAllFiles(Result)
+        loopAllFiles()
         print(Result)
         return jsonify({'res': Result, 'status': True})
     return jsonify({"sucess": False, 'message': "fail"})
@@ -166,6 +166,14 @@ def Github():
         gitext.search(repo)
         return jsonify({"sucess": True, 'message': "done"})
     return jsonify({"sucess": False, 'message': "fail"})
+
+@app.route('/result', methods=['POST', 'GET'])
+def previous():
+    global Result
+    Result = []
+    loopAllFiles()
+    print(Result)
+    return jsonify({'res': Result, 'status': True})
 
 if __name__ == '__main__':
     app.run(port=8000,debug=True)

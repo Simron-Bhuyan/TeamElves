@@ -3,10 +3,21 @@
 #include "../Other/Other.hpp"
 
 
+
+
+
+
+
+
 namespace ecs
 {
     ECS_STRONG_TYPEDEF(std::size_t, DataIndex);
     ECS_STRONG_TYPEDEF(std::size_t, EntityIndex);
+
+    // We're going to need two additional strong typedefs:
+    // * One for indices of handle data (auxiliary array indices).
+    // * One for the type of handle counter.
+
     ECS_STRONG_TYPEDEF(std::size_t, HandleDataIndex);
     ECS_STRONG_TYPEDEF(int, Counter);
 
@@ -19,22 +30,44 @@ namespace ecs
             using Bitset = typename Settings::Bitset;
 
             DataIndex dataIndex;
+
+            // Entities must be aware of what handle is pointing
+            // to them, so that the handle can be updated if the
+            // entity gets moved around after a `refresh()`.
             HandleDataIndex handleDataIndex;
+
             Bitset bitset;
             bool alive;
         };
 
+        // Our "handle data" class will be a simple pair
+        // of `EntityIndex` and `Counter`.
         struct HandleData
         {
             EntityIndex entityIndex;
             Counter counter;
         };
 
+        // And our actual `Handle` class will be a simple pair
+        // of `HandleDataIndex` and `Counter`.
         struct Handle
         {
             HandleDataIndex handleDataIndex;
             Counter counter;
         };
+
+        // To access an entity through an handle, these steps
+        // will occur:
+        //
+        // 1. The corresponding `HandleData` is retrieved,
+        //    using the `handleDataIndex` stored in the handle.
+        //
+        // 2. If the handle's counter does not match the handle
+        //    data's counter, then the handle is not valid anymore.
+        //
+        // 3. Otherwise, the entity will be retrieved through the
+        //    handle data's `entityIndex` member.
+        //
 
         template <typename TSettings>
         class ComponentStorage
@@ -267,6 +300,8 @@ namespace ecs
         std::vector<Entity> entities;
         SignatureBitsetsStorage signatureBitsets;
         ComponentStorage components;
+
+        // Handle data will be stored in a vector, like entities.
         std::vector<HandleData> handleData;
 
         void growTo(std::size_t mNewCapacity)
@@ -275,6 +310,8 @@ namespace ecs
 
             entities.resize(mNewCapacity);
             components.grow(mNewCapacity);
+
+            // Do not forget to grow the new container.
             handleData.resize(mNewCapacity);
 
             for(auto i(capacity); i < mNewCapacity; ++i)
@@ -285,8 +322,19 @@ namespace ecs
                 e.dataIndex = i;
                 e.bitset.reset();
                 e.alive = false;
+
+                // New entities will need to know what their
+                // handle is. During initialization, it will
+                // be the handle "directly below them".
                 e.handleDataIndex = i;
 
+                // New handle data instances will have to
+                // be initialized with a value for their counter
+                // and the index of the entity they're pointing
+                // at (which will be the one "directly on top of
+                // them", at that point in time).
+
+                // Set handledata values.
                 h.counter = 0;
                 h.entityIndex = i;
             }
@@ -312,8 +360,18 @@ namespace ecs
             return entities[mI];
         }
 
+        // We'll need some getters for `handleData`.
+        // We can get `HandleData` instances in three ways:
+        // * Through an `HandleDataIndex`.
+        // * Through an `EntityIndex` -> `HandleDataIndex`.
+        // * Through an `Handle` -> `HandleDataIndex`.
+
+        // Some code repetition is necessary...
+
         auto& getHandleData(HandleDataIndex mI) noexcept
         {
+            // The handle for an entity does not necessarily have to
+            // be before the `sizeNext` index.
             assert(handleData.size() > mI);
             return handleData[mI];
         }
@@ -344,10 +402,19 @@ namespace ecs
     public:
         Manager() { growTo(100); }
 
+        // How to check if an handle is valid?
+        // Comparing its counter to the corresponding handle data
+        // counter is enough.
         auto isHandleValid(const Handle& mX) const noexcept
         {
             return mX.counter == getHandleData(mX).counter;
         }
+
+        // All methods that we previously could call with `EntityIndex`
+        // should also be possible to call using handles.
+
+        // Let's create a method that returns an `EntityIndex` from
+        // an handle valid to aid us.
 
         auto getEntityIndex(const Handle& mX) const noexcept
         {
@@ -433,6 +500,8 @@ namespace ecs
             return addComponent<T>(getEntityIndex(mX), FWD(mXs)...);
         }
 
+        // `getComponent` will simply return a reference to the
+        // component, after asserting its existance.
         template <typename T>
         auto& getComponent(EntityIndex mI) noexcept
         {
@@ -472,25 +541,50 @@ namespace ecs
             return freeIndex;
         }
 
+        // If the user does not need to track a specific entity,
+        // `createIndex()` can be used.
+
+        // Otherwise, we'll need to create a new method that
+        // returns an handle.
+
         auto createHandle()
         {
+            // Let's start by creating an entity with
+            // `createIndex()`, and storing the result.
             auto freeIndex(createIndex());
             assert(isAlive(freeIndex));
 
+            // We'll need to "match" the new entity
+            // and the new handle together.
             auto& e(entities[freeIndex]);
             auto& hd(handleData[e.handleDataIndex]);
+
+            // Let's update the entity's corresponding
+            // handle data to point to the new index.
             hd.entityIndex = freeIndex;
 
+            // Initialize a valid entity handle.
             Handle h;
+
+            // The handle will point to the entity's
+            // handle data...
             h.handleDataIndex = e.handleDataIndex;
+
+            // ...and its validity counter will be set
+            // to the handle data's current counter.
             h.counter = hd.counter;
+
+            // Assert entity handle validity.
             assert(isHandleValid(h));
 
+            // Return a copy of the entity handle.
             return h;
         }
 
         void clear() noexcept
         {
+            // Let's re-initialize handles during `clear()`.
+
             for(auto i(0u); i < capacity; ++i)
             {
                 auto& e(entities[i]);
@@ -579,12 +673,24 @@ namespace ecs
         };
 
     private:
+        // We'll need to do something when iterating over dead
+        // entities during `refreshImpl()` to make sure their
+        // handles get invalidated.
+
+        // Invalidating an handle is as simple as incrementing
+        // its counter.
         void invalidateHandle(EntityIndex mX) noexcept
         {
             auto& hd(handleData[entities[mX].handleDataIndex]);
             ++hd.counter;
         }
 
+        // We'll also need that swapped alive entities' handles
+        // point to the new correct indices.
+
+        // It is sufficient to get the handle data from the entity,
+        // after it has been swapped, and update its entity index
+        // with the new one.
         void refreshHandle(EntityIndex mX) noexcept
         {
             auto& hd(handleData[entities[mX].handleDataIndex]);
@@ -601,12 +707,20 @@ namespace ecs
                 {
                     if(iD > iA) return iD;
                     if(!entities[iD].alive) break;
+
+                    // There is no need to invalidate or refresh
+                    // handles of untouched alive entities.
                 }
 
                 for(; true; --iA)
                 {
                     if(entities[iA].alive) break;
+
+                    // New dead entities on the right need to be
+                    // invalidated. Their handle index doesn't need
+                    // to be changed.
                     invalidateHandle(iA);
+
                     if(iA <= iD) return iD;
                 }
 
@@ -615,8 +729,12 @@ namespace ecs
 
                 std::swap(entities[iA], entities[iD]);
 
+                // After swap, the alive entity's handle must be
+                // refreshed, but not invalidated.
                 refreshHandle(iD);
 
+                // After swap, the dead entity's handle must be
+                // both refreshed and invalidated.
                 invalidateHandle(iA);
                 refreshHandle(iA);
 
@@ -648,19 +766,8 @@ namespace ecs
     };
 }
 
-
-
-
-
-
-
-
-
-
 namespace example
 {
-    // The component types we previously defined for the
-    // particle simulation will be useful.
     struct CPosition
     {
         Vec2f value;
@@ -673,88 +780,35 @@ namespace example
     {
         Vec2f value;
     };
-
-    // "Life" will always automatically decrement.
     struct CLife
     {
         float value;
     };
 
-    // "Health" will decrement when an entity "takes damage".
-    struct CHealth
-    {
-        float value;
-    };
-
-    // A "cooldown" is a timer for entity actions. It will be used to
-    // periodically have the player and the boss shoot bullets.
-    struct CCooldown
-    {
-        float value, maxValue;
-    };
-
-    // The rendering components will be simple wrappers
-    // for SFML shape classes.
-    struct CShapeRectangle
+    struct CRender
     {
         sf::RectangleShape shape;
-    };
-    struct CShapeCircle
-    {
-        sf::CircleShape shape;
-    };
 
-    // The collision component will simply store the
-    // effective radius of the object.
-    struct CCircleHitbox
-    {
-        float radius;
+        CRender()
+        {
+            shape.setFillColor(sf::Color::Red);
+            shape.setSize(Vec2f{5.f, 5.f});
+        }
     };
 
     using MyComponents =
-        ecs::ComponentList<CPosition, CVelocity, CAcceleration, CLife, CHealth,
-            CCooldown, CShapeRectangle, CShapeCircle, CCircleHitbox>;
+        ecs::ComponentList<CPosition, CVelocity, CAcceleration, CRender, CLife>;
 
-    // We'll need tags for every game object in this situation,
-    // as all of them have special interactions between each other.
-    struct TPlayer
-    {
-    };
-    struct TBoss
-    {
-    };
-    struct TBullet
-    {
-    };
-    struct TPlayerBullet
-    {
-    };
-
-    using MyTags = ecs::TagList<TPlayer, TBoss, TBullet, TPlayerBullet>;
+    using MyTags = ecs::TagList<>;
 
     using SApplyVelocity = ecs::Signature<CPosition, CVelocity>;
     using SApplyAcceleration = ecs::Signature<CVelocity, CAcceleration>;
+    using SRender = ecs::Signature<CPosition, CRender>;
     using SLife = ecs::Signature<CLife>;
-    using SHealth = ecs::Signature<CHealth>;
-
-    using SRenderRectangle = ecs::Signature<CPosition, CShapeRectangle>;
-    using SRenderCircle = ecs::Signature<CPosition, CShapeCircle>;
-
-    using SPlayer =
-        ecs::Signature<TPlayer, CPosition, CVelocity, CCircleHitbox, CCooldown>;
-
-    using SBoss = ecs::Signature<TBoss, CPosition, CVelocity, CCircleHitbox,
-        CHealth, CCooldown>;
-
-    // Bullet signatures only differ because of their tags.
-    using SBullet = ecs::Signature<TBullet, CPosition, CCircleHitbox>;
-
-    using SPlayerBullet =
-        ecs::Signature<TPlayerBullet, CPosition, CCircleHitbox>;
+    using SGrow = ecs::Signature<CRender, CLife>;
 
     using MySignatures = ecs::SignatureList<SApplyVelocity, SApplyAcceleration,
-        SLife, SHealth, SRenderRectangle, SRenderCircle, SPlayer, SBoss,
-        SBullet, SPlayerBullet>;
+        SRender, SLife, SGrow>;
 
     using MySettings = ecs::Settings<MyComponents, MyTags, MySignatures>;
 
@@ -764,178 +818,53 @@ namespace example
     {
         MyManager mgr;
 
-        // Entity creation during "updates" can cause the internal manager
-        // storage to reallocate. Therefore, we use a vector of generic
-        // type-erased functions to store our entity creation actions and
-        // execute them after the "update" and before the "refresh".
-        std::vector<std::function<void()>> beforeRefresh;
-
-        auto mkPlayer()
-        {
-            auto e(mgr.createIndex());
-            mgr.addTag<TPlayer>(e);
-
-            auto& pos(mgr.addComponent<CPosition>(e).value);
-            auto& vel(mgr.addComponent<CVelocity>(e).value);
-            auto& hitbox(mgr.addComponent<CCircleHitbox>(e).radius);
-            auto& shape(mgr.addComponent<CShapeRectangle>(e).shape);
-            auto& cooldown(mgr.addComponent<CCooldown>(e));
-
-            pos = {320.f / 2.f, 240.f - 70.f};
-            vel = {0.f, 0.f};
-            hitbox = 2.5f;
-            shape.setFillColor(sf::Color::Green);
-            Vec2f size{4.f, 6.5f};
-            shape.setSize(size);
-            shape.setOrigin(size / 2.f);
-            cooldown.value = cooldown.maxValue = 1.6f;
-
-            return e;
-        }
-
-        auto mkBoss()
-        {
-            auto e(mgr.createIndex());
-            mgr.addTag<TBoss>(e);
-
-            auto& pos(mgr.addComponent<CPosition>(e).value);
-            auto& vel(mgr.addComponent<CVelocity>(e).value);
-            auto& hitbox(mgr.addComponent<CCircleHitbox>(e).radius);
-            auto& shape(mgr.addComponent<CShapeRectangle>(e).shape);
-            auto& health(mgr.addComponent<CHealth>(e).value);
-            auto& cooldown(mgr.addComponent<CCooldown>(e));
-
-            pos = {320.f / 2.f, 40.f};
-            vel = {0.f, 0.f};
-            hitbox = 5.5f;
-            shape.setFillColor(sf::Color::Magenta);
-            Vec2f size{6.f, 9.5f};
-            shape.setSize(size);
-            shape.setOrigin(size / 2.f);
-            health = 100.f;
-            cooldown.value = cooldown.maxValue = 70.f;
-
-            return e;
-        }
-
-        auto mkBullet(const Vec2f& mPos)
-        {
-            auto e(mgr.createIndex());
-            mgr.addTag<TBullet>(e);
-
-            auto& pos(mgr.addComponent<CPosition>(e).value);
-            auto& vel(mgr.addComponent<CVelocity>(e).value);
-            auto& acc(mgr.addComponent<CAcceleration>(e).value);
-            auto& hitbox(mgr.addComponent<CCircleHitbox>(e).radius);
-            auto& shape(mgr.addComponent<CShapeCircle>(e).shape);
-            auto& life(mgr.addComponent<CLife>(e).value);
-
-            pos = mPos;
-            vel = {0.f, 0.f};
-            acc = {ssvu::getRndR(-0.01f, 0.01f), ssvu::getRndR(-0.01f, 0.02f)};
-            hitbox = 0.5f;
-            shape.setFillColor(sf::Color::Red);
-            shape.setRadius(1.1f);
-            life = 500.f;
-
-            return e;
-        }
-
-        auto mkPlayerBullet(const Vec2f& mPos)
-        {
-            auto e(mgr.createIndex());
-            mgr.addTag<TPlayerBullet>(e);
-
-            auto& pos(mgr.addComponent<CPosition>(e).value);
-            auto& vel(mgr.addComponent<CVelocity>(e).value);
-            auto& acc(mgr.addComponent<CAcceleration>(e).value);
-            auto& hitbox(mgr.addComponent<CCircleHitbox>(e).radius);
-            auto& shape(mgr.addComponent<CShapeCircle>(e).shape);
-            auto& life(mgr.addComponent<CLife>(e).value);
-
-            pos = mPos;
-            vel = {0.f, -6.f};
-            acc = {0.f, 0.f};
-            hitbox = 0.5f;
-            shape.setFillColor(sf::Color::Cyan);
-            shape.setRadius(1.1f);
-            life = 200.f;
-
-            return e;
-        }
+        // Let's test handles by keeping track of particles with even
+        // index.
+        std::vector<MyManager::Handle> trackedParticles;
 
         Game(ssvs::GameWindow& mX) : Boilerplate::TestApp{mX}
         {
             onTxtInfoUpdate += [this](auto& oss, FT)
             {
                 oss << "Entities: " << mgr.getEntityCount() << "\n";
+                oss << "Tracked: " << trackedParticles.size() << "\n";
             };
-
-            // The game begins by creating a boss and a player.
-            mkBoss();
-            mkPlayer();
-        }
-
-        // Helper function that checks if two circles intersect.
-        auto isCollision(const CPosition& mP0, const CCircleHitbox& mC0,
-            const CPosition& mP1, const CCircleHitbox& mC1)
-        {
-            auto dist(ssvs::getDistEuclidean(mP0.value, mP1.value));
-            return dist <= (mC0.radius + mC1.radius);
-        }
-
-        // Helper function that queues a specific action if an entity is
-        // ready to perform it. Used for bullet spawning.
-        template <typename TFunction>
-        void cooldownAction(FT mFT, CCooldown& mCD, TFunction&& mFunction)
-        {
-            mCD.value -= mFT;
-            if(mCD.value > 0.f) return;
-
-            beforeRefresh.emplace_back(mFunction);
-            mCD.value = mCD.maxValue;
-        }
-
-        // Helper function that manages input for movement and shooting.
-        void updatePlayerInput(
-            FT mFT, CPosition& pPos, CVelocity& pVel, CCooldown& pCD)
-        {
-            constexpr float speed{2.f};
-            Vec2f xyInput;
-            bool shoot;
-
-            using SFK = sf::Keyboard;
-
-            // Get horizontal movement.
-            if(SFK::isKeyPressed(SFK::Key::Left))
-                xyInput.x = -1;
-            else if(SFK::isKeyPressed(SFK::Key::Right))
-                xyInput.x = 1;
-
-            // Get vertical movement.
-            if(SFK::isKeyPressed(SFK::Key::Up))
-                xyInput.y = -1;
-            else if(SFK::isKeyPressed(SFK::Key::Down))
-                xyInput.y = 1;
-
-            // Get shooting state.
-            shoot = SFK::isKeyPressed(SFK::Key::Z);
-
-            // Calculate velocity vector.
-            auto radians(ssvs::getRad(xyInput));
-            pVel.value =
-                ssvs::getVecFromRad(radians) * (speed * ssvs::getMag(xyInput));
-
-            // Enqueue shooting action.
-            cooldownAction(mFT, pCD, [this, shoot, pPos]
-                {
-                    if(!shoot) return;
-                    this->mkPlayerBullet(pPos.value);
-                });
         }
 
         void update(FT mFT) override
         {
+            for(auto i(0u); i < 40; ++i)
+            {
+                auto e(mgr.createHandle());
+
+                auto setRndVec2([](auto& mVec, auto mX)
+                    {
+                        mVec.x = ssvu::getRndR(-mX, mX);
+                        mVec.y = ssvu::getRndR(-mX, mX);
+                    });
+
+                auto& pos(mgr.addComponent<CPosition>(e).value);
+                setRndVec2(pos, 100.f);
+
+                auto& vel(mgr.addComponent<CVelocity>(e).value);
+                setRndVec2(vel, 4.f);
+
+                auto& acc(mgr.addComponent<CAcceleration>(e).value);
+                setRndVec2(acc, 0.4f);
+
+                auto& life(mgr.addComponent<CLife>(e).value);
+                life = ssvu::getRndR(10.f, 130.f);
+
+                auto& shape(mgr.addComponent<CRender>(e).shape);
+                shape.setFillColor(sf::Color(ssvu::getRndI(150, 255),
+                    ssvu::getRndI(30, 70), ssvu::getRndI(30, 70), 255));
+
+                if(i % 2 == 0)
+                {
+                    trackedParticles.emplace_back(e);
+                }
+            }
+
             mgr.forEntitiesMatching<SApplyVelocity>(
                 [mFT](auto, auto& cPosition, auto& cVelocity)
                 {
@@ -948,98 +877,54 @@ namespace example
                     cVelocity.value += cAcceleration.value * mFT;
                 });
 
-            mgr.forEntitiesMatching<SRenderRectangle>(
-                [](auto, auto& cPosition, auto& cShapeRectangle)
+            mgr.forEntitiesMatching<SRender>(
+                [](auto, auto& cPosition, auto& cRender)
                 {
-                    cShapeRectangle.shape.setPosition(cPosition.value);
-                });
-
-            mgr.forEntitiesMatching<SRenderCircle>(
-                [](auto, auto& cPosition, auto& cShapeCircle)
-                {
-                    cShapeCircle.shape.setPosition(cPosition.value);
+                    auto& s(cRender.shape);
+                    s.setPosition(cPosition.value);
                 });
 
             mgr.forEntitiesMatching<SLife>([mFT, this](auto e, auto& cLife)
                 {
                     cLife.value -= mFT;
-                    if(cLife.value <= 0) mgr.kill(e);
+
+                    if(cLife.value <= 0)
+                    {
+                        mgr.kill(e);
+                    }
                 });
 
-            mgr.forEntitiesMatching<SHealth>([mFT, this](auto e, auto& cHealth)
+            mgr.forEntitiesMatching<SGrow>([](auto, auto& cRender, auto& cLife)
                 {
-                    if(cHealth.value <= 0) mgr.kill(e);
+                    auto l(0.8f + (cLife.value * 0.3f));
+                    cRender.shape.setSize(Vec2f{l, l});
                 });
 
-            // Player logic.
-            mgr.forEntitiesMatching<SPlayer>([this, mFT](
-                auto pI, auto& pPos, auto& pVel, auto& pHitbox, auto& pCD)
-                {
-                    this->updatePlayerInput(mFT, pPos, pVel, pCD);
+            // "Erase-remove_if" all invalid handles.
+            trackedParticles.erase(std::remove_if(std::begin(trackedParticles),
+                                       std::end(trackedParticles),
+                                       [this](auto& h)
+                                       {
+                                           return !mgr.isHandleValid(h);
+                                       }),
+                std::end(trackedParticles));
 
-                    // Player/Boss logic.
-                    // If there is a player and a boss, the boss will move
-                    // towards the player and try to shoot.
-                    mgr.forEntitiesMatching<SBoss>([this, mFT, &pPos](auto,
-                        auto& bssPos, auto& bssVel, auto&, auto&, auto& bssCD)
-                        {
-                            constexpr auto speed(0.7f);
-                            auto left(pPos.value.x < bssPos.value.x);
-                            bssVel.value.x = left ? -speed : speed;
+            // Make all tracked particles move towards east.
+            for(auto& h : trackedParticles)
+            {
+                auto& vel(mgr.getComponent<CVelocity>(h).value);
+                auto& acc(mgr.getComponent<CAcceleration>(h).value);
 
-                            this->cooldownAction(mFT, bssCD, [this, bssPos]
-                                {
-                                    for(auto i(0u); i < 70; ++i)
-                                        this->mkBullet(bssPos.value);
-                                });
-                        });
-
-                    // Player/Bullet logic.
-                    // Checks collisions between the player and enemy bullets.
-                    mgr.forEntitiesMatching<SBullet>([this, pI, &pPos,
-                        &pHitbox](auto, auto& bltPos, auto& bltHitbox)
-                        {
-                            if(this->isCollision(
-                                   pPos, pHitbox, bltPos, bltHitbox))
-                                mgr.kill(pI);
-                        });
-                });
-
-            // PlayerBullet logic.
-            mgr.forEntitiesMatching<SPlayerBullet>(
-                [this](auto pbI, auto& pbPos, auto& pbHitbox)
-                {
-                    // PlayerBullet/Boss logic.
-                    // Checks collisions between the boss and player bullets.
-                    mgr.forEntitiesMatching<SBoss>(
-                        [this, pbI, &pbPos, &pbHitbox](auto, auto& bssPos,
-                            auto&, auto& bssHitbox, auto& bssHealth, auto&)
-                        {
-                            if(this->isCollision(
-                                   pbPos, pbHitbox, bssPos, bssHitbox))
-                            {
-                                bssHealth.value -= 1;
-                                mgr.kill(pbI);
-                            }
-                        });
-                });
-
-            for(auto& f : beforeRefresh) f();
-            beforeRefresh.clear();
+                vel.x = 30.f;
+                vel.y = acc.x = acc.y = 0.f;
+            }
 
             mgr.refresh();
         }
 
         void draw() override
         {
-            mgr.forEntitiesMatching<SRenderRectangle>(
-                [this](auto, auto&, auto& cRender)
-                {
-                    this->render(cRender.shape);
-                });
-
-            mgr.forEntitiesMatching<SRenderCircle>(
-                [this](auto, auto&, auto& cRender)
+            mgr.forEntitiesMatching<SRender>([this](auto, auto&, auto& cRender)
                 {
                     this->render(cRender.shape);
                 });
@@ -1054,84 +939,16 @@ int main()
 }
 
 
-
-
 #include <utility>
 #include <iostream>
 #include <tuple>
 #include <unordered_map>
-#include <vector>
 
 
 
 
-
-
-template <bool... Ts>
-struct AllTrueCPP14 : std::true_type
-{
-};
-
-template <bool T, bool... Ts>
-struct AllTrueCPP14<T, Ts...>
-    : std::integral_constant<bool, T && AllTrueCPP14<Ts...>{}>
-{
-};
-
-static_assert(AllTrueCPP14<>{}, "");
-static_assert(AllTrueCPP14<true, true, true>{}, "");
-static_assert(!AllTrueCPP14<true, true, false>{}, "");
-static_assert(!AllTrueCPP14<false, false, false>{}, "");
-
-
-
-
-template <bool... Ts>
-using AllTrueCPP17 = std::integral_constant<bool, (Ts && ...)>;
-
-
-static_assert(AllTrueCPP17<>{}, "");
-static_assert(AllTrueCPP17<true, true, true>{}, "");
-static_assert(!AllTrueCPP17<true, true, false>{}, "");
-static_assert(!AllTrueCPP17<false, false, false>{}, "");
-
-
-
-template <typename... Ts>
-void printAll(Ts&&... mXs)
-{
-    (std::cout << ... << mXs) << '\n';
-}
-
-template <typename TF, typename... Ts>
-void forArgs(TF&& mFn, Ts&&... mXs)
-{
-    (mFn(mXs), ...);
-}
-
-template <typename... Ts>
-auto make_vector(Ts&&... mXs)
-{
-    std::vector<std::common_type_t<Ts...>> result;
-    result.reserve(sizeof...(Ts));
-    (result.emplace_back(std::forward<Ts>(mXs)), ...);
-
-    return result;
-}
-
-
-template <std::size_t TIStart, typename TF, typename TTpl, std::size_t... TIs>
-void forNArgsStep(TF&& mFn, TTpl&& mTpl, std::index_sequence<TIs...>)
-{
-    mFn(std::get<TIStart + TIs>(mTpl)...);
-}
-
-template <std::size_t TArity, typename TF, typename TTpl, std::size_t... TIs>
-void forNArgsExpansion(TF&& mFn, TTpl&& mTpl, std::index_sequence<TIs...>)
-{
-    using SeqGet = std::make_index_sequence<TArity>;
-    (forNArgsStep<TIs * TArity>(mFn, mTpl, SeqGet{}), ...);
-}
+template <typename, typename>
+struct forNArgsImpl;
 
 template <std::size_t TArity, typename TF, typename... Ts>
 void forNArgs(TF&& mFn, Ts&&... mXs)
@@ -1140,43 +957,178 @@ void forNArgs(TF&& mFn, Ts&&... mXs)
 
     static_assert(numberOfArgs % TArity == 0, "Invalid number of arguments");
 
-    auto&& asTpl(std::forward_as_tuple(std::forward<Ts>(mXs)...));
-
-    // We need to "convert" the `Ts...` pack into a "list" of packs
-    // of size `TArity`.
-
-    using SeqCalls = std::make_index_sequence<numberOfArgs / TArity>;
-    forNArgsExpansion<TArity>(mFn, asTpl, SeqCalls{});
+    forNArgsImpl<std::make_index_sequence<numberOfArgs / TArity>,
+        std::make_index_sequence<TArity>>::exec(mFn,
+        std::forward_as_tuple(std::forward<Ts>(mXs)...));
 }
 
+template <std::size_t... TNCalls, std::size_t... TNArity>
+struct forNArgsImpl<std::index_sequence<TNCalls...>,
+    std::index_sequence<TNArity...>>
+{
+    template <typename TF, typename... Ts>
+    static void exec(TF&& mFn, const std::tuple<Ts...>& mXs)
+    {
+        constexpr auto arity(sizeof...(TNArity));
+        using swallow = bool[];
+
+        (void)swallow{(execN<TNCalls * arity>(mFn, mXs), true)...};
+    }
+
+    template <std::size_t TNBase, typename TF, typename... Ts>
+    static void execN(TF&& mFn, const std::tuple<Ts...>& mXs)
+    {
+        mFn(std::get<TNBase + TNArity>(mXs)...);
+    }
+};
+
+
+
+
+template <typename... TArgs>
+auto make_unordered_map(TArgs&&... mArgs);
+
+
+
+
+
+template <typename TSeq, typename... Ts>
+struct CommonKVHelper;
+
+template <std::size_t... TIs, typename... Ts>
+struct CommonKVHelper<std::index_sequence<TIs...>, Ts...>
+{
+    // Let's make sure the number of variadic types is a multiple of
+    // two.
+    static_assert(sizeof...(Ts) % 2 == 0, "");
+
+    // We need a way to get the type at a specific index from a
+    // variadic type list. Fortunately, we can make use of
+    // `std::tuple_element_t` to do that.
+
+    // `std::tuple_element_t` takes two template parameters: an index
+    // and a tuple type. It then "returns" the type of the tuple
+    // element at that specific index.
+
+    // Our `TypeAt` type alias will return the type at index `TI` from
+    // the variadic `Ts...` type pack.
+    template <std::size_t TI>
+    using TypeAt = std::tuple_element_t<TI, std::tuple<Ts...>>;
+
+    // To get the common type of the keys, we'll expand our index
+    // sequence multiplying every number by two.
+    using KeyType = std::common_type_t<TypeAt<TIs * 2>...>;
+
+    // To get the common type of the values, we'll expand our index
+    // sequence multiplying every number by two, adding one.
+    using ValueType = std::common_type_t<TypeAt<(TIs * 2) + 1>...>;
+
+    // Example expansion for 6 types:
+    /*
+        // (TIs...) = (0, 1, 2)
+
+        using KeyType = std::common_type_t
+        <
+            TypeAt<0 * 2>, // TypeAt<0>
+            TypeAt<1 * 2>, // TypeAt<2>
+            TypeAt<2 * 2>  // TypeAt<4>
+        >;
+
+        using ValueType = std::common_type_t
+        <
+            TypeAt<(0 * 2) + 1>, // TypeAt<1>
+            TypeAt<(1 * 2) + 1>, // TypeAt<3>
+            TypeAt<(2 * 2) + 1>  // TypeAt<5>
+        >;
+    */
+};
+
+template <typename... Ts>
+using HelperFor =
+    CommonKVHelper<std::make_index_sequence<sizeof...(Ts) / 2>, Ts...>;
+
+
+template <typename... Ts>
+using CommonKeyType = typename HelperFor<Ts...>::KeyType;
+
+template <typename... Ts>
+using CommonValueType = typename HelperFor<Ts...>::ValueType;
+
+
+static_assert(std::is_same<CommonKeyType<std::string, int>,
+
+                  // Deduced key type:
+                  std::string>(),
+    "");
+
+static_assert(std::is_same<CommonValueType<std::string, int>,
+
+                  // Deduced value type:
+                  int>(),
+    "");
+
+static_assert(
+    std::is_same<CommonKeyType<
+                     // Keys         // Values
+                     std::string, int, std::string, float, const char*, long>,
+
+        // Deduced key type:
+        std::string>(),
+    "");
+
+static_assert(
+    std::is_same<CommonValueType<
+                     // Keys         // Values
+                     std::string, int, std::string, float, const char*, long>,
+
+        // Deduced value type:
+        float>(),
+    "");
+
+
+template <typename... TArgs>
+auto make_unordered_map(TArgs&&... mArgs)
+{
+    // Let's calculate and alias the common types:
+    using KeyType = CommonKeyType<TArgs...>;
+    using ValueType = CommonValueType<TArgs...>;
+
+    // Let's instantiate an `std::unordered_map` with the correct
+    // type and reserve memory for the passed elements:
+    std::unordered_map<KeyType, ValueType> result;
+    result.reserve(sizeof...(TArgs) / 2);
+
+    // We can now use `forNArgs<2>` to pass elements two by two to a
+    // lambda function that will emplace them as key-value pairs in
+    // the `std::unordered_map`.
+
+    forNArgs<2>(
+        [&result](auto&& k, auto&& v)
+        {
+            result.emplace(
+                std::forward<decltype(k)>(k), std::forward<decltype(v)>(v));
+        },
+
+        std::forward<TArgs>(mArgs)...);
+
+    return result;
+}
 
 int main()
 {
-    auto printWrapper([](auto... xs)
-        {
-            (std::cout << ... << xs);
-            std::cout << " ";
-        });
+    using namespace std::literals;
 
-    // Prints "0123":
-    printWrapper(0, 1, 2, 3);
-    std::cout << "\n";
+    auto m = make_unordered_map("zero"s, 0, "one"s, 1, "two", 2.f);
 
-    // Prints "0 1 2 3":
-    forArgs(printWrapper, 0, 1, 2, 3);
-    std::cout << "\n";
+    static_assert(
+        std::is_same<decltype(m), std::unordered_map<std::string, float>>(),
+        "");
 
-    // Prints "0 1 2 3":
-    for(auto x : make_vector(0, 1, 2, 3)) printWrapper(x);
-    std::cout << "\n";
+    // Prints "012".
+    std::cout << m["zero"] << m["one"] << m["two"];
 
-    // Prints "01 23 45 67":
-    forNArgs<2>(printWrapper, 0, 1, 2, 3, 4, 5, 6, 7);
     std::cout << "\n";
-
-    // Prints "abc def ghi":
-    forNArgs<3>(printWrapper, "a", "b", "c", "d", "e", "f", "g", "h", "i");
-    std::cout << "\n";
+    return 0;
 }
 
 
@@ -1185,10 +1137,21 @@ int main()
 #include "../Other/Other.hpp"
 
 
+
+
+
+
+
+
 namespace ecs
 {
     ECS_STRONG_TYPEDEF(std::size_t, DataIndex);
     ECS_STRONG_TYPEDEF(std::size_t, EntityIndex);
+
+    // We're going to need two additional strong typedefs:
+    // * One for indices of handle data (auxiliary array indices).
+    // * One for the type of handle counter.
+
     ECS_STRONG_TYPEDEF(std::size_t, HandleDataIndex);
     ECS_STRONG_TYPEDEF(int, Counter);
 
@@ -1201,22 +1164,44 @@ namespace ecs
             using Bitset = typename Settings::Bitset;
 
             DataIndex dataIndex;
+
+            // Entities must be aware of what handle is pointing
+            // to them, so that the handle can be updated if the
+            // entity gets moved around after a `refresh()`.
             HandleDataIndex handleDataIndex;
+
             Bitset bitset;
             bool alive;
         };
 
+        // Our "handle data" class will be a simple pair
+        // of `EntityIndex` and `Counter`.
         struct HandleData
         {
             EntityIndex entityIndex;
             Counter counter;
         };
 
+        // And our actual `Handle` class will be a simple pair
+        // of `HandleDataIndex` and `Counter`.
         struct Handle
         {
             HandleDataIndex handleDataIndex;
             Counter counter;
         };
+
+        // To access an entity through an handle, these steps
+        // will occur:
+        //
+        // 1. The corresponding `HandleData` is retrieved,
+        //    using the `handleDataIndex` stored in the handle.
+        //
+        // 2. If the handle's counter does not match the handle
+        //    data's counter, then the handle is not valid anymore.
+        //
+        // 3. Otherwise, the entity will be retrieved through the
+        //    handle data's `entityIndex` member.
+        //
 
         template <typename TSettings>
         class ComponentStorage
@@ -1449,6 +1434,8 @@ namespace ecs
         std::vector<Entity> entities;
         SignatureBitsetsStorage signatureBitsets;
         ComponentStorage components;
+
+        // Handle data will be stored in a vector, like entities.
         std::vector<HandleData> handleData;
 
         void growTo(std::size_t mNewCapacity)
@@ -1457,6 +1444,8 @@ namespace ecs
 
             entities.resize(mNewCapacity);
             components.grow(mNewCapacity);
+
+            // Do not forget to grow the new container.
             handleData.resize(mNewCapacity);
 
             for(auto i(capacity); i < mNewCapacity; ++i)
@@ -1467,8 +1456,19 @@ namespace ecs
                 e.dataIndex = i;
                 e.bitset.reset();
                 e.alive = false;
+
+                // New entities will need to know what their
+                // handle is. During initialization, it will
+                // be the handle "directly below them".
                 e.handleDataIndex = i;
 
+                // New handle data instances will have to
+                // be initialized with a value for their counter
+                // and the index of the entity they're pointing
+                // at (which will be the one "directly on top of
+                // them", at that point in time).
+
+                // Set handledata values.
                 h.counter = 0;
                 h.entityIndex = i;
             }
@@ -1494,8 +1494,18 @@ namespace ecs
             return entities[mI];
         }
 
+        // We'll need some getters for `handleData`.
+        // We can get `HandleData` instances in three ways:
+        // * Through an `HandleDataIndex`.
+        // * Through an `EntityIndex` -> `HandleDataIndex`.
+        // * Through an `Handle` -> `HandleDataIndex`.
+
+        // Some code repetition is necessary...
+
         auto& getHandleData(HandleDataIndex mI) noexcept
         {
+            // The handle for an entity does not necessarily have to
+            // be before the `sizeNext` index.
             assert(handleData.size() > mI);
             return handleData[mI];
         }
@@ -1526,10 +1536,19 @@ namespace ecs
     public:
         Manager() { growTo(100); }
 
+        // How to check if an handle is valid?
+        // Comparing its counter to the corresponding handle data
+        // counter is enough.
         auto isHandleValid(const Handle& mX) const noexcept
         {
             return mX.counter == getHandleData(mX).counter;
         }
+
+        // All methods that we previously could call with `EntityIndex`
+        // should also be possible to call using handles.
+
+        // Let's create a method that returns an `EntityIndex` from
+        // an handle valid to aid us.
 
         auto getEntityIndex(const Handle& mX) const noexcept
         {
@@ -1615,6 +1634,8 @@ namespace ecs
             return addComponent<T>(getEntityIndex(mX), FWD(mXs)...);
         }
 
+        // `getComponent` will simply return a reference to the
+        // component, after asserting its existance.
         template <typename T>
         auto& getComponent(EntityIndex mI) noexcept
         {
@@ -1654,25 +1675,50 @@ namespace ecs
             return freeIndex;
         }
 
+        // If the user does not need to track a specific entity,
+        // `createIndex()` can be used.
+
+        // Otherwise, we'll need to create a new method that
+        // returns an handle.
+
         auto createHandle()
         {
+            // Let's start by creating an entity with
+            // `createIndex()`, and storing the result.
             auto freeIndex(createIndex());
             assert(isAlive(freeIndex));
 
+            // We'll need to "match" the new entity
+            // and the new handle together.
             auto& e(entities[freeIndex]);
             auto& hd(handleData[e.handleDataIndex]);
+
+            // Let's update the entity's corresponding
+            // handle data to point to the new index.
             hd.entityIndex = freeIndex;
 
+            // Initialize a valid entity handle.
             Handle h;
+
+            // The handle will point to the entity's
+            // handle data...
             h.handleDataIndex = e.handleDataIndex;
+
+            // ...and its validity counter will be set
+            // to the handle data's current counter.
             h.counter = hd.counter;
+
+            // Assert entity handle validity.
             assert(isHandleValid(h));
 
+            // Return a copy of the entity handle.
             return h;
         }
 
         void clear() noexcept
         {
+            // Let's re-initialize handles during `clear()`.
+
             for(auto i(0u); i < capacity; ++i)
             {
                 auto& e(entities[i]);
@@ -1761,12 +1807,24 @@ namespace ecs
         };
 
     private:
+        // We'll need to do something when iterating over dead
+        // entities during `refreshImpl()` to make sure their
+        // handles get invalidated.
+
+        // Invalidating an handle is as simple as incrementing
+        // its counter.
         void invalidateHandle(EntityIndex mX) noexcept
         {
             auto& hd(handleData[entities[mX].handleDataIndex]);
             ++hd.counter;
         }
 
+        // We'll also need that swapped alive entities' handles
+        // point to the new correct indices.
+
+        // It is sufficient to get the handle data from the entity,
+        // after it has been swapped, and update its entity index
+        // with the new one.
         void refreshHandle(EntityIndex mX) noexcept
         {
             auto& hd(handleData[entities[mX].handleDataIndex]);
@@ -1783,12 +1841,20 @@ namespace ecs
                 {
                     if(iD > iA) return iD;
                     if(!entities[iD].alive) break;
+
+                    // There is no need to invalidate or refresh
+                    // handles of untouched alive entities.
                 }
 
                 for(; true; --iA)
                 {
                     if(entities[iA].alive) break;
+
+                    // New dead entities on the right need to be
+                    // invalidated. Their handle index doesn't need
+                    // to be changed.
                     invalidateHandle(iA);
+
                     if(iA <= iD) return iD;
                 }
 
@@ -1797,8 +1863,12 @@ namespace ecs
 
                 std::swap(entities[iA], entities[iD]);
 
+                // After swap, the alive entity's handle must be
+                // refreshed, but not invalidated.
                 refreshHandle(iD);
 
+                // After swap, the dead entity's handle must be
+                // both refreshed and invalidated.
                 invalidateHandle(iA);
                 refreshHandle(iA);
 
@@ -1830,19 +1900,8 @@ namespace ecs
     };
 }
 
-
-
-
-
-
-
-
-
-
 namespace example
 {
-    // The component types we previously defined for the
-    // particle simulation will be useful.
     struct CPosition
     {
         Vec2f value;
@@ -1855,88 +1914,35 @@ namespace example
     {
         Vec2f value;
     };
-
-    // "Life" will always automatically decrement.
     struct CLife
     {
         float value;
     };
 
-    // "Health" will decrement when an entity "takes damage".
-    struct CHealth
-    {
-        float value;
-    };
-
-    // A "cooldown" is a timer for entity actions. It will be used to
-    // periodically have the player and the boss shoot bullets.
-    struct CCooldown
-    {
-        float value, maxValue;
-    };
-
-    // The rendering components will be simple wrappers
-    // for SFML shape classes.
-    struct CShapeRectangle
+    struct CRender
     {
         sf::RectangleShape shape;
-    };
-    struct CShapeCircle
-    {
-        sf::CircleShape shape;
-    };
 
-    // The collision component will simply store the
-    // effective radius of the object.
-    struct CCircleHitbox
-    {
-        float radius;
+        CRender()
+        {
+            shape.setFillColor(sf::Color::Red);
+            shape.setSize(Vec2f{5.f, 5.f});
+        }
     };
 
     using MyComponents =
-        ecs::ComponentList<CPosition, CVelocity, CAcceleration, CLife, CHealth,
-            CCooldown, CShapeRectangle, CShapeCircle, CCircleHitbox>;
+        ecs::ComponentList<CPosition, CVelocity, CAcceleration, CRender, CLife>;
 
-    // We'll need tags for every game object in this situation,
-    // as all of them have special interactions between each other.
-    struct TPlayer
-    {
-    };
-    struct TBoss
-    {
-    };
-    struct TBullet
-    {
-    };
-    struct TPlayerBullet
-    {
-    };
-
-    using MyTags = ecs::TagList<TPlayer, TBoss, TBullet, TPlayerBullet>;
+    using MyTags = ecs::TagList<>;
 
     using SApplyVelocity = ecs::Signature<CPosition, CVelocity>;
     using SApplyAcceleration = ecs::Signature<CVelocity, CAcceleration>;
+    using SRender = ecs::Signature<CPosition, CRender>;
     using SLife = ecs::Signature<CLife>;
-    using SHealth = ecs::Signature<CHealth>;
-
-    using SRenderRectangle = ecs::Signature<CPosition, CShapeRectangle>;
-    using SRenderCircle = ecs::Signature<CPosition, CShapeCircle>;
-
-    using SPlayer =
-        ecs::Signature<TPlayer, CPosition, CVelocity, CCircleHitbox, CCooldown>;
-
-    using SBoss = ecs::Signature<TBoss, CPosition, CVelocity, CCircleHitbox,
-        CHealth, CCooldown>;
-
-    // Bullet signatures only differ because of their tags.
-    using SBullet = ecs::Signature<TBullet, CPosition, CCircleHitbox>;
-
-    using SPlayerBullet =
-        ecs::Signature<TPlayerBullet, CPosition, CCircleHitbox>;
+    using SGrow = ecs::Signature<CRender, CLife>;
 
     using MySignatures = ecs::SignatureList<SApplyVelocity, SApplyAcceleration,
-        SLife, SHealth, SRenderRectangle, SRenderCircle, SPlayer, SBoss,
-        SBullet, SPlayerBullet>;
+        SRender, SLife, SGrow>;
 
     using MySettings = ecs::Settings<MyComponents, MyTags, MySignatures>;
 
@@ -1946,178 +1952,53 @@ namespace example
     {
         MyManager mgr;
 
-        // Entity creation during "updates" can cause the internal manager
-        // storage to reallocate. Therefore, we use a vector of generic
-        // type-erased functions to store our entity creation actions and
-        // execute them after the "update" and before the "refresh".
-        std::vector<std::function<void()>> beforeRefresh;
-
-        auto mkPlayer()
-        {
-            auto e(mgr.createIndex());
-            mgr.addTag<TPlayer>(e);
-
-            auto& pos(mgr.addComponent<CPosition>(e).value);
-            auto& vel(mgr.addComponent<CVelocity>(e).value);
-            auto& hitbox(mgr.addComponent<CCircleHitbox>(e).radius);
-            auto& shape(mgr.addComponent<CShapeRectangle>(e).shape);
-            auto& cooldown(mgr.addComponent<CCooldown>(e));
-
-            pos = {320.f / 2.f, 240.f - 70.f};
-            vel = {0.f, 0.f};
-            hitbox = 2.5f;
-            shape.setFillColor(sf::Color::Green);
-            Vec2f size{4.f, 6.5f};
-            shape.setSize(size);
-            shape.setOrigin(size / 2.f);
-            cooldown.value = cooldown.maxValue = 1.6f;
-
-            return e;
-        }
-
-        auto mkBoss()
-        {
-            auto e(mgr.createIndex());
-            mgr.addTag<TBoss>(e);
-
-            auto& pos(mgr.addComponent<CPosition>(e).value);
-            auto& vel(mgr.addComponent<CVelocity>(e).value);
-            auto& hitbox(mgr.addComponent<CCircleHitbox>(e).radius);
-            auto& shape(mgr.addComponent<CShapeRectangle>(e).shape);
-            auto& health(mgr.addComponent<CHealth>(e).value);
-            auto& cooldown(mgr.addComponent<CCooldown>(e));
-
-            pos = {320.f / 2.f, 40.f};
-            vel = {0.f, 0.f};
-            hitbox = 5.5f;
-            shape.setFillColor(sf::Color::Magenta);
-            Vec2f size{6.f, 9.5f};
-            shape.setSize(size);
-            shape.setOrigin(size / 2.f);
-            health = 100.f;
-            cooldown.value = cooldown.maxValue = 70.f;
-
-            return e;
-        }
-
-        auto mkBullet(const Vec2f& mPos)
-        {
-            auto e(mgr.createIndex());
-            mgr.addTag<TBullet>(e);
-
-            auto& pos(mgr.addComponent<CPosition>(e).value);
-            auto& vel(mgr.addComponent<CVelocity>(e).value);
-            auto& acc(mgr.addComponent<CAcceleration>(e).value);
-            auto& hitbox(mgr.addComponent<CCircleHitbox>(e).radius);
-            auto& shape(mgr.addComponent<CShapeCircle>(e).shape);
-            auto& life(mgr.addComponent<CLife>(e).value);
-
-            pos = mPos;
-            vel = {0.f, 0.f};
-            acc = {ssvu::getRndR(-0.01f, 0.01f), ssvu::getRndR(-0.01f, 0.02f)};
-            hitbox = 0.5f;
-            shape.setFillColor(sf::Color::Red);
-            shape.setRadius(1.1f);
-            life = 500.f;
-
-            return e;
-        }
-
-        auto mkPlayerBullet(const Vec2f& mPos)
-        {
-            auto e(mgr.createIndex());
-            mgr.addTag<TPlayerBullet>(e);
-
-            auto& pos(mgr.addComponent<CPosition>(e).value);
-            auto& vel(mgr.addComponent<CVelocity>(e).value);
-            auto& acc(mgr.addComponent<CAcceleration>(e).value);
-            auto& hitbox(mgr.addComponent<CCircleHitbox>(e).radius);
-            auto& shape(mgr.addComponent<CShapeCircle>(e).shape);
-            auto& life(mgr.addComponent<CLife>(e).value);
-
-            pos = mPos;
-            vel = {0.f, -6.f};
-            acc = {0.f, 0.f};
-            hitbox = 0.5f;
-            shape.setFillColor(sf::Color::Cyan);
-            shape.setRadius(1.1f);
-            life = 200.f;
-
-            return e;
-        }
+        // Let's test handles by keeping track of particles with even
+        // index.
+        std::vector<MyManager::Handle> trackedParticles;
 
         Game(ssvs::GameWindow& mX) : Boilerplate::TestApp{mX}
         {
             onTxtInfoUpdate += [this](auto& oss, FT)
             {
                 oss << "Entities: " << mgr.getEntityCount() << "\n";
+                oss << "Tracked: " << trackedParticles.size() << "\n";
             };
-
-            // The game begins by creating a boss and a player.
-            mkBoss();
-            mkPlayer();
-        }
-
-        // Helper function that checks if two circles intersect.
-        auto isCollision(const CPosition& mP0, const CCircleHitbox& mC0,
-            const CPosition& mP1, const CCircleHitbox& mC1)
-        {
-            auto dist(ssvs::getDistEuclidean(mP0.value, mP1.value));
-            return dist <= (mC0.radius + mC1.radius);
-        }
-
-        // Helper function that queues a specific action if an entity is
-        // ready to perform it. Used for bullet spawning.
-        template <typename TFunction>
-        void cooldownAction(FT mFT, CCooldown& mCD, TFunction&& mFunction)
-        {
-            mCD.value -= mFT;
-            if(mCD.value > 0.f) return;
-
-            beforeRefresh.emplace_back(mFunction);
-            mCD.value = mCD.maxValue;
-        }
-
-        // Helper function that manages input for movement and shooting.
-        void updatePlayerInput(
-            FT mFT, CPosition& pPos, CVelocity& pVel, CCooldown& pCD)
-        {
-            constexpr float speed{2.f};
-            Vec2f xyInput;
-            bool shoot;
-
-            using SFK = sf::Keyboard;
-
-            // Get horizontal movement.
-            if(SFK::isKeyPressed(SFK::Key::Left))
-                xyInput.x = -1;
-            else if(SFK::isKeyPressed(SFK::Key::Right))
-                xyInput.x = 1;
-
-            // Get vertical movement.
-            if(SFK::isKeyPressed(SFK::Key::Up))
-                xyInput.y = -1;
-            else if(SFK::isKeyPressed(SFK::Key::Down))
-                xyInput.y = 1;
-
-            // Get shooting state.
-            shoot = SFK::isKeyPressed(SFK::Key::Z);
-
-            // Calculate velocity vector.
-            auto radians(ssvs::getRad(xyInput));
-            pVel.value =
-                ssvs::getVecFromRad(radians) * (speed * ssvs::getMag(xyInput));
-
-            // Enqueue shooting action.
-            cooldownAction(mFT, pCD, [this, shoot, pPos]
-                {
-                    if(!shoot) return;
-                    this->mkPlayerBullet(pPos.value);
-                });
         }
 
         void update(FT mFT) override
         {
+            for(auto i(0u); i < 40; ++i)
+            {
+                auto e(mgr.createHandle());
+
+                auto setRndVec2([](auto& mVec, auto mX)
+                    {
+                        mVec.x = ssvu::getRndR(-mX, mX);
+                        mVec.y = ssvu::getRndR(-mX, mX);
+                    });
+
+                auto& pos(mgr.addComponent<CPosition>(e).value);
+                setRndVec2(pos, 100.f);
+
+                auto& vel(mgr.addComponent<CVelocity>(e).value);
+                setRndVec2(vel, 4.f);
+
+                auto& acc(mgr.addComponent<CAcceleration>(e).value);
+                setRndVec2(acc, 0.4f);
+
+                auto& life(mgr.addComponent<CLife>(e).value);
+                life = ssvu::getRndR(10.f, 130.f);
+
+                auto& shape(mgr.addComponent<CRender>(e).shape);
+                shape.setFillColor(sf::Color(ssvu::getRndI(150, 255),
+                    ssvu::getRndI(30, 70), ssvu::getRndI(30, 70), 255));
+
+                if(i % 2 == 0)
+                {
+                    trackedParticles.emplace_back(e);
+                }
+            }
+
             mgr.forEntitiesMatching<SApplyVelocity>(
                 [mFT](auto, auto& cPosition, auto& cVelocity)
                 {
@@ -2130,98 +2011,54 @@ namespace example
                     cVelocity.value += cAcceleration.value * mFT;
                 });
 
-            mgr.forEntitiesMatching<SRenderRectangle>(
-                [](auto, auto& cPosition, auto& cShapeRectangle)
+            mgr.forEntitiesMatching<SRender>(
+                [](auto, auto& cPosition, auto& cRender)
                 {
-                    cShapeRectangle.shape.setPosition(cPosition.value);
-                });
-
-            mgr.forEntitiesMatching<SRenderCircle>(
-                [](auto, auto& cPosition, auto& cShapeCircle)
-                {
-                    cShapeCircle.shape.setPosition(cPosition.value);
+                    auto& s(cRender.shape);
+                    s.setPosition(cPosition.value);
                 });
 
             mgr.forEntitiesMatching<SLife>([mFT, this](auto e, auto& cLife)
                 {
                     cLife.value -= mFT;
-                    if(cLife.value <= 0) mgr.kill(e);
+
+                    if(cLife.value <= 0)
+                    {
+                        mgr.kill(e);
+                    }
                 });
 
-            mgr.forEntitiesMatching<SHealth>([mFT, this](auto e, auto& cHealth)
+            mgr.forEntitiesMatching<SGrow>([](auto, auto& cRender, auto& cLife)
                 {
-                    if(cHealth.value <= 0) mgr.kill(e);
+                    auto l(0.8f + (cLife.value * 0.3f));
+                    cRender.shape.setSize(Vec2f{l, l});
                 });
 
-            // Player logic.
-            mgr.forEntitiesMatching<SPlayer>([this, mFT](
-                auto pI, auto& pPos, auto& pVel, auto& pHitbox, auto& pCD)
-                {
-                    this->updatePlayerInput(mFT, pPos, pVel, pCD);
+            // "Erase-remove_if" all invalid handles.
+            trackedParticles.erase(std::remove_if(std::begin(trackedParticles),
+                                       std::end(trackedParticles),
+                                       [this](auto& h)
+                                       {
+                                           return !mgr.isHandleValid(h);
+                                       }),
+                std::end(trackedParticles));
 
-                    // Player/Boss logic.
-                    // If there is a player and a boss, the boss will move
-                    // towards the player and try to shoot.
-                    mgr.forEntitiesMatching<SBoss>([this, mFT, &pPos](auto,
-                        auto& bssPos, auto& bssVel, auto&, auto&, auto& bssCD)
-                        {
-                            constexpr auto speed(0.7f);
-                            auto left(pPos.value.x < bssPos.value.x);
-                            bssVel.value.x = left ? -speed : speed;
+            // Make all tracked particles move towards east.
+            for(auto& h : trackedParticles)
+            {
+                auto& vel(mgr.getComponent<CVelocity>(h).value);
+                auto& acc(mgr.getComponent<CAcceleration>(h).value);
 
-                            this->cooldownAction(mFT, bssCD, [this, bssPos]
-                                {
-                                    for(auto i(0u); i < 70; ++i)
-                                        this->mkBullet(bssPos.value);
-                                });
-                        });
-
-                    // Player/Bullet logic.
-                    // Checks collisions between the player and enemy bullets.
-                    mgr.forEntitiesMatching<SBullet>([this, pI, &pPos,
-                        &pHitbox](auto, auto& bltPos, auto& bltHitbox)
-                        {
-                            if(this->isCollision(
-                                   pPos, pHitbox, bltPos, bltHitbox))
-                                mgr.kill(pI);
-                        });
-                });
-
-            // PlayerBullet logic.
-            mgr.forEntitiesMatching<SPlayerBullet>(
-                [this](auto pbI, auto& pbPos, auto& pbHitbox)
-                {
-                    // PlayerBullet/Boss logic.
-                    // Checks collisions between the boss and player bullets.
-                    mgr.forEntitiesMatching<SBoss>(
-                        [this, pbI, &pbPos, &pbHitbox](auto, auto& bssPos,
-                            auto&, auto& bssHitbox, auto& bssHealth, auto&)
-                        {
-                            if(this->isCollision(
-                                   pbPos, pbHitbox, bssPos, bssHitbox))
-                            {
-                                bssHealth.value -= 1;
-                                mgr.kill(pbI);
-                            }
-                        });
-                });
-
-            for(auto& f : beforeRefresh) f();
-            beforeRefresh.clear();
+                vel.x = 30.f;
+                vel.y = acc.x = acc.y = 0.f;
+            }
 
             mgr.refresh();
         }
 
         void draw() override
         {
-            mgr.forEntitiesMatching<SRenderRectangle>(
-                [this](auto, auto&, auto& cRender)
-                {
-                    this->render(cRender.shape);
-                });
-
-            mgr.forEntitiesMatching<SRenderCircle>(
-                [this](auto, auto&, auto& cRender)
+            mgr.forEntitiesMatching<SRender>([this](auto, auto&, auto& cRender)
                 {
                     this->render(cRender.shape);
                 });
@@ -2236,84 +2073,16 @@ int main()
 }
 
 
-
-
 #include <utility>
 #include <iostream>
 #include <tuple>
 #include <unordered_map>
-#include <vector>
 
 
 
 
-
-
-template <bool... Ts>
-struct AllTrueCPP14 : std::true_type
-{
-};
-
-template <bool T, bool... Ts>
-struct AllTrueCPP14<T, Ts...>
-    : std::integral_constant<bool, T && AllTrueCPP14<Ts...>{}>
-{
-};
-
-static_assert(AllTrueCPP14<>{}, "");
-static_assert(AllTrueCPP14<true, true, true>{}, "");
-static_assert(!AllTrueCPP14<true, true, false>{}, "");
-static_assert(!AllTrueCPP14<false, false, false>{}, "");
-
-
-
-
-template <bool... Ts>
-using AllTrueCPP17 = std::integral_constant<bool, (Ts && ...)>;
-
-
-static_assert(AllTrueCPP17<>{}, "");
-static_assert(AllTrueCPP17<true, true, true>{}, "");
-static_assert(!AllTrueCPP17<true, true, false>{}, "");
-static_assert(!AllTrueCPP17<false, false, false>{}, "");
-
-
-
-template <typename... Ts>
-void printAll(Ts&&... mXs)
-{
-    (std::cout << ... << mXs) << '\n';
-}
-
-template <typename TF, typename... Ts>
-void forArgs(TF&& mFn, Ts&&... mXs)
-{
-    (mFn(mXs), ...);
-}
-
-template <typename... Ts>
-auto make_vector(Ts&&... mXs)
-{
-    std::vector<std::common_type_t<Ts...>> result;
-    result.reserve(sizeof...(Ts));
-    (result.emplace_back(std::forward<Ts>(mXs)), ...);
-
-    return result;
-}
-
-
-template <std::size_t TIStart, typename TF, typename TTpl, std::size_t... TIs>
-void forNArgsStep(TF&& mFn, TTpl&& mTpl, std::index_sequence<TIs...>)
-{
-    mFn(std::get<TIStart + TIs>(mTpl)...);
-}
-
-template <std::size_t TArity, typename TF, typename TTpl, std::size_t... TIs>
-void forNArgsExpansion(TF&& mFn, TTpl&& mTpl, std::index_sequence<TIs...>)
-{
-    using SeqGet = std::make_index_sequence<TArity>;
-    (forNArgsStep<TIs * TArity>(mFn, mTpl, SeqGet{}), ...);
-}
+template <typename, typename>
+struct forNArgsImpl;
 
 template <std::size_t TArity, typename TF, typename... Ts>
 void forNArgs(TF&& mFn, Ts&&... mXs)
@@ -2322,43 +2091,178 @@ void forNArgs(TF&& mFn, Ts&&... mXs)
 
     static_assert(numberOfArgs % TArity == 0, "Invalid number of arguments");
 
-    auto&& asTpl(std::forward_as_tuple(std::forward<Ts>(mXs)...));
-
-    // We need to "convert" the `Ts...` pack into a "list" of packs
-    // of size `TArity`.
-
-    using SeqCalls = std::make_index_sequence<numberOfArgs / TArity>;
-    forNArgsExpansion<TArity>(mFn, asTpl, SeqCalls{});
+    forNArgsImpl<std::make_index_sequence<numberOfArgs / TArity>,
+        std::make_index_sequence<TArity>>::exec(mFn,
+        std::forward_as_tuple(std::forward<Ts>(mXs)...));
 }
 
+template <std::size_t... TNCalls, std::size_t... TNArity>
+struct forNArgsImpl<std::index_sequence<TNCalls...>,
+    std::index_sequence<TNArity...>>
+{
+    template <typename TF, typename... Ts>
+    static void exec(TF&& mFn, const std::tuple<Ts...>& mXs)
+    {
+        constexpr auto arity(sizeof...(TNArity));
+        using swallow = bool[];
+
+        (void)swallow{(execN<TNCalls * arity>(mFn, mXs), true)...};
+    }
+
+    template <std::size_t TNBase, typename TF, typename... Ts>
+    static void execN(TF&& mFn, const std::tuple<Ts...>& mXs)
+    {
+        mFn(std::get<TNBase + TNArity>(mXs)...);
+    }
+};
+
+
+
+
+template <typename... TArgs>
+auto make_unordered_map(TArgs&&... mArgs);
+
+
+
+
+
+template <typename TSeq, typename... Ts>
+struct CommonKVHelper;
+
+template <std::size_t... TIs, typename... Ts>
+struct CommonKVHelper<std::index_sequence<TIs...>, Ts...>
+{
+    // Let's make sure the number of variadic types is a multiple of
+    // two.
+    static_assert(sizeof...(Ts) % 2 == 0, "");
+
+    // We need a way to get the type at a specific index from a
+    // variadic type list. Fortunately, we can make use of
+    // `std::tuple_element_t` to do that.
+
+    // `std::tuple_element_t` takes two template parameters: an index
+    // and a tuple type. It then "returns" the type of the tuple
+    // element at that specific index.
+
+    // Our `TypeAt` type alias will return the type at index `TI` from
+    // the variadic `Ts...` type pack.
+    template <std::size_t TI>
+    using TypeAt = std::tuple_element_t<TI, std::tuple<Ts...>>;
+
+    // To get the common type of the keys, we'll expand our index
+    // sequence multiplying every number by two.
+    using KeyType = std::common_type_t<TypeAt<TIs * 2>...>;
+
+    // To get the common type of the values, we'll expand our index
+    // sequence multiplying every number by two, adding one.
+    using ValueType = std::common_type_t<TypeAt<(TIs * 2) + 1>...>;
+
+    // Example expansion for 6 types:
+    /*
+        // (TIs...) = (0, 1, 2)
+
+        using KeyType = std::common_type_t
+        <
+            TypeAt<0 * 2>, // TypeAt<0>
+            TypeAt<1 * 2>, // TypeAt<2>
+            TypeAt<2 * 2>  // TypeAt<4>
+        >;
+
+        using ValueType = std::common_type_t
+        <
+            TypeAt<(0 * 2) + 1>, // TypeAt<1>
+            TypeAt<(1 * 2) + 1>, // TypeAt<3>
+            TypeAt<(2 * 2) + 1>  // TypeAt<5>
+        >;
+    */
+};
+
+template <typename... Ts>
+using HelperFor =
+    CommonKVHelper<std::make_index_sequence<sizeof...(Ts) / 2>, Ts...>;
+
+
+template <typename... Ts>
+using CommonKeyType = typename HelperFor<Ts...>::KeyType;
+
+template <typename... Ts>
+using CommonValueType = typename HelperFor<Ts...>::ValueType;
+
+
+static_assert(std::is_same<CommonKeyType<std::string, int>,
+
+                  // Deduced key type:
+                  std::string>(),
+    "");
+
+static_assert(std::is_same<CommonValueType<std::string, int>,
+
+                  // Deduced value type:
+                  int>(),
+    "");
+
+static_assert(
+    std::is_same<CommonKeyType<
+                     // Keys         // Values
+                     std::string, int, std::string, float, const char*, long>,
+
+        // Deduced key type:
+        std::string>(),
+    "");
+
+static_assert(
+    std::is_same<CommonValueType<
+                     // Keys         // Values
+                     std::string, int, std::string, float, const char*, long>,
+
+        // Deduced value type:
+        float>(),
+    "");
+
+
+template <typename... TArgs>
+auto make_unordered_map(TArgs&&... mArgs)
+{
+    // Let's calculate and alias the common types:
+    using KeyType = CommonKeyType<TArgs...>;
+    using ValueType = CommonValueType<TArgs...>;
+
+    // Let's instantiate an `std::unordered_map` with the correct
+    // type and reserve memory for the passed elements:
+    std::unordered_map<KeyType, ValueType> result;
+    result.reserve(sizeof...(TArgs) / 2);
+
+    // We can now use `forNArgs<2>` to pass elements two by two to a
+    // lambda function that will emplace them as key-value pairs in
+    // the `std::unordered_map`.
+
+    forNArgs<2>(
+        [&result](auto&& k, auto&& v)
+        {
+            result.emplace(
+                std::forward<decltype(k)>(k), std::forward<decltype(v)>(v));
+        },
+
+        std::forward<TArgs>(mArgs)...);
+
+    return result;
+}
 
 int main()
 {
-    auto printWrapper([](auto... xs)
-        {
-            (std::cout << ... << xs);
-            std::cout << " ";
-        });
+    using namespace std::literals;
 
-    // Prints "0123":
-    printWrapper(0, 1, 2, 3);
-    std::cout << "\n";
+    auto m = make_unordered_map("zero"s, 0, "one"s, 1, "two", 2.f);
 
-    // Prints "0 1 2 3":
-    forArgs(printWrapper, 0, 1, 2, 3);
-    std::cout << "\n";
+    static_assert(
+        std::is_same<decltype(m), std::unordered_map<std::string, float>>(),
+        "");
 
-    // Prints "0 1 2 3":
-    for(auto x : make_vector(0, 1, 2, 3)) printWrapper(x);
-    std::cout << "\n";
+    // Prints "012".
+    std::cout << m["zero"] << m["one"] << m["two"];
 
-    // Prints "01 23 45 67":
-    forNArgs<2>(printWrapper, 0, 1, 2, 3, 4, 5, 6, 7);
     std::cout << "\n";
-
-    // Prints "abc def ghi":
-    forNArgs<3>(printWrapper, "a", "b", "c", "d", "e", "f", "g", "h", "i");
-    std::cout << "\n";
+    return 0;
 }
 
 
