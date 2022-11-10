@@ -6,7 +6,6 @@ nltk.download('punkt')
 keep_tokens = {
     "[":1,
     "]":1,
-    "#":1,
     "(":1,
     ")":1,
     "<":1,
@@ -53,9 +52,10 @@ def keep_words(tokens, keep_tokens):
 def getResults(fileName, Result):
     myfile1 = open('file.txt', 'r')
     myfile2 = open('database/'+fileName, 'r')
-    file1 = open('B1.cpp','w')
-    file2 = open('B2.cpp','w')
+    file1 = open('testFile1.cpp','w')
+    file2 = open('testFile2.cpp','w')
 
+    # removing comments
     for line in myfile1.readlines():
         if not (line.startswith('//')):
             file1.write(line)
@@ -66,13 +66,15 @@ def getResults(fileName, Result):
 
     file2.close()
     file1.close()
+    myfile2.close()
+    myfile1.close()
 
-    finalfile1 = open("B1.cpp",'r')
+    finalfile1 = open("testFile1.cpp",'r')
     contents1 = finalfile1.read()       
     finalfile1.close()
     inp = contents1
 
-    finalfile2 = open("B2.cpp",'r')
+    finalfile2 = open("testFile2.cpp",'r')
     contents2 = finalfile2.read()       
     finalfile2.close()   
     inp2 = contents2
