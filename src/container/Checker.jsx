@@ -1,8 +1,17 @@
-import React from 'react'
+import React,{useState,useEffect} from 'react'
+import FileInput from '../components/FileInput'
+import axios from "axios";
+import Main from "../components/Main";
+function Checker(props) {
+ 
 
-function Checker() {
+   
   return (
-    <div>Checker</div>
+    <div className="">
+   {props.file}
+   {props.per}
+   <Main/>
+    </div>
   )
 }
 
