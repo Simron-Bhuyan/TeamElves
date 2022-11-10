@@ -16,9 +16,10 @@ const Result = (props) => {
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <div className="min-h-[70vh] mt-9 flex justify-center w-[95vw]">
         <div className="flex flex-col items-center justify-center w-[80vw] overflow-x-hidden">
-          <h1 className="text-3xl font-bold">Result</h1>
+          <h1 className="text-4xl font-bold">Result</h1>
+          <p>Matches with {results.length} Files</p>
           <div className="resultContainer my-6">
-            {results.map((result) => (<div className="resultBar flex w-96 border-2 rounded-lg border-[#a74b94] p-4 justify-between my-2">
+          { results.length === 0 ? <p>No Matches Found</p> : results.map((result) => (<div className="resultBar flex w-[80vw] sm:w-[50vw] border-2 rounded-lg border-[#a74b94] p-4 justify-between my-2">
               <div className="filename">
                 <p className="text-lg">{result[0]}</p>
               </div>
@@ -26,7 +27,8 @@ const Result = (props) => {
                 <p className="font-bold"><span>{result[1]}%</span>&nbsp;<span className="font-normal">Match</span></p>
               </div>
             </div>
-            ))}
+            ))
+          }
           </div>
         </div>
       </div>
