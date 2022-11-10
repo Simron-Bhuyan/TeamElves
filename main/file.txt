@@ -1,0 +1,12 @@
+include <bits/stdc++.h>
+using namespace std;
+int sum10(int z ,int y)
+{
+    int s=z+y;
+    return s;
+}
+int main(){
+    int a,b;
+    cin>> a >> b;
+    cout<< add(a,b)<<"\n";
+} 
