@@ -1,9 +1,10 @@
-from flask import Flask, flash, request, redirect, url_for, send_from_directory
+from flask import Flask, flash, request, redirect, url_for, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 import os
-# import gitext
+import gitext
 from flask_cors import CORS
 import nltk
+import json
 import difflib
 app=Flask(__name__)
 CORS(app)
@@ -107,36 +108,31 @@ def getResults(fileName):
             tokens2[i]="Loop"
         if(tokens2[i]=="while"):
             tokens2[i]="Loop"
-    
-    # for i in range(len(tokens)):
-    #     if tokens[i] in ['{','}','(',')']:
-    #         tokens.remove(tokens[i])
 
     keep_words(tokens, keep_tokens)
     keep_words(tokens2, keep_tokens)
-    # print(tokens)
-    # print(tokens2)
     sm=difflib.SequenceMatcher(None,tokens,tokens2)
     finalans=sm.ratio()*100
     finalans=round(finalans,2)
     Result.append((fileName, finalans))
+    # print(fileName, finalans,Result)
 
 def loopAllFiles():
     for file in os.listdir(os.getcwd()+'/database'):
         getResults(file)
 
 ################################################################
-
-@app.route('/plagiarism',methods=['GET'])
-def get():
-    return {
-        'File':"dummy.py", 
-        "Percentage": 'yryfyfhv', 
-        }
+@app.route('/result', methods=['GET', 'POST'])
+def all():
+    Result = []
+    loopAllFiles()
+    print(Result)
+    return jsonify({'res': Result, 'status': True})
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
   if request.method == 'POST':
+      global Result
       f = request.files['file']
       print(f)
       f.save(secure_filename('file.txt'))
@@ -146,12 +142,35 @@ def upload_file():
       return jsonify({'res': Result, 'status': True})
   return jsonify({'res': 'Failed To Upload', 'status': False})
 
+@app.route('/code', methods=['GET', 'POST'])
+def code():
+    global Result
+    data = request.data.decode('utf-8')
+    codeData = json.loads(data)['code']
+    print(codeData)
+    if codeData != '':
+        file = open('file.txt','w')
+        file.write(codeData)
+        file.close()
+        Result = []
+        loopAllFiles()
+        print(Result)
+        return jsonify({'res': Result, 'status': True})
+    return jsonify({"sucess": False, 'message': "fail"})
+
+@app.route('/', methods=['GET', 'POST'])
+def display():
+    return "welcome to detecto"
 
 @app.route('/github', methods=["POST", "GET"])
 def Github():
-
-    gitext.search()
-    return ""
+    data = request.data.decode('utf-8')
+    repo = json.loads(data)['repo']
+    print(repo)
+    if repo != '':
+        gitext.search(repo)
+        return jsonify({"sucess": True, 'message': "done"})
+    return jsonify({"sucess": False, 'message': "fail"})
 
 if __name__ == '__main__':
-    app.run(port=5000,debug=True)
+    app.run(port=8000,debug=True)
