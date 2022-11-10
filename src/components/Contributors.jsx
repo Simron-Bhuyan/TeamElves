@@ -13,11 +13,16 @@ function Contributors() {
       <div className=" my-24 px-6 mx-auto text-center justify-around items-center">
         <div className="mb-32 text-gray-800 text-center justify-between items-center">
           <div className="grid gap-x-6 lg:gap-x-12 md:grid-cols-5">
-            <MembersCard name={"Aryan"} imgUrl={Aryan} gitUrl={ "https://github.com/SwiftFox1839"} LinkedIn={" https://www.linkedin.com/in/aryan-a3115b256/"} mail={"aryanisme2003@gmail.com"}/>
+            {/* <MembersCard name={"Aryan"} imgUrl={Aryan} gitUrl={ "https://github.com/SwiftFox1839"} LinkedIn={" https://www.linkedin.com/in/aryan-a3115b256/"} mail={"aryanisme2003@gmail.com"}/>
             <MembersCard name={"Simron Bhuyan"} imgUrl={Simron}gitUrl={"https://github.com/Simron-Bhuyan"} LinkedIn={"https://www.linkedin.com/in/simron-bhuyan-856b73205/"} mail={"simron0707@gmail.com"}/>
             <MembersCard name={"Khusi Das Mohapatra"} imgUrl={Khusi}gitUrl={"https://github.com/Khusidm"} LinkedIn={"https://www.linkedin.com/in/khusi-das-mohapatra-058652235"} mail={"khusidasm7@gmail.com"}/>
             <MembersCard name={"Padmakshi Mandal"} imgUrl={Padmakshi}gitUrl={"https://github.com/padmakshimandal"} LinkedIn={"https://www.linkedin.com/in/padmakshi-mandal-a59466202/"} mail={"padmakshi.mandal@gmail.com"}/>
-            <MembersCard name={"Ipsita Satapathy"} imgUrl={Ipsita}gitUrl={"https://github.com/ipsitasatapathy"} LinkedIn={"https://www.linkedin.com/in/ipsita-satapathy-788509210"} mail={"ipshu.satapathy@gmail.com"}/>
+            <MembersCard name={"Ipsita Satapathy"} imgUrl={Ipsita}gitUrl={"https://github.com/ipsitasatapathy"} LinkedIn={"https://www.linkedin.com/in/ipsita-satapathy-788509210"} mail={"ipshu.satapathy@gmail.com"}/> */}
+            <MembersCard name={"Aryan"} imgUrl={'https://user-images.githubusercontent.com/89746011/201058234-ab8eaf52-e036-482f-891c-6419e932c810.jpg'} gitUrl={ "https://github.com/SwiftFox1839"} LinkedIn={" https://www.linkedin.com/in/aryan-a3115b256/"} mail={"aryanisme2003@gmail.com"}/>
+            <MembersCard name={"Simron Bhuyan"} imgUrl={"https://user-images.githubusercontent.com/89746011/201059803-217f2992-98a3-463f-af48-b0dbd372d4c8.png"}gitUrl={"https://github.com/Simron-Bhuyan"} LinkedIn={"https://www.linkedin.com/in/simron-bhuyan-856b73205/"} mail={"simron0707@gmail.com"}/>
+            <MembersCard name={"Khusi Das Mohapatra"} imgUrl={"https://user-images.githubusercontent.com/89746011/201059100-d81ce61a-c418-4a89-bdbd-88e6607e8092.jpg"}gitUrl={"https://github.com/Khusidm"} LinkedIn={"https://www.linkedin.com/in/khusi-das-mohapatra-058652235"} mail={"khusidasm7@gmail.com"}/>
+            <MembersCard name={"Padmakshi Mandal"} imgUrl={"https://user-images.githubusercontent.com/89746011/201059492-53f33d2c-4110-4d02-9eb4-a0ba60df18a0.jpg"}gitUrl={"https://github.com/padmakshimandal"} LinkedIn={"https://www.linkedin.com/in/padmakshi-mandal-a59466202/"} mail={"padmakshi.mandal@gmail.com"}/>
+            <MembersCard name={"Ipsita Satapathy"} imgUrl={"https://user-images.githubusercontent.com/89746011/201058763-9fcabea4-faba-4cc3-8c5d-453952b73834.jpg"}gitUrl={"https://github.com/ipsitasatapathy"} LinkedIn={"https://www.linkedin.com/in/ipsita-satapathy-788509210"} mail={"ipshu.satapathy@gmail.com"}/>
             {/* <div className="mb-24 md:mb-0">
               <div className="rounded-lg shadow-lg h-full block bg-white">
                 <div className="flex justify-center">
