@@ -44,13 +44,7 @@ class EditorExample extends Component {
 
   render() {
     return (
-      <Editor
-        value={this.state.code}
-        onValueChange={this.onValueChange}
-        highlight={this.highlight}
-        padding={10}
-        style={styles.root}
-      />
+
     )
   }
 }

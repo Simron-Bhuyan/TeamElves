@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { BACKEND_URL } from "../URLConfig";
 
 const DatabaseAddition = () => {
   const [darkMode, toggleDarkMode] = useState(false);
@@ -8,13 +9,13 @@ const DatabaseAddition = () => {
   const [loading, setLoading] = useState(false);
   const postRepoName = () => {
     setLoading(true);
-    fetch("http://localhost:3001/api/addRepo", {
+    fetch(`${BACKEND_URL}/github`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        repoName: repoName,
+        repo: repoName,
       }),
     })
       .then((res) => res.json())
