@@ -7,6 +7,7 @@ const Result = (props) => {
   const [darkMode, toggleDarkMode] = useState(false);
   const [results, setResults] = useState([]);
   useEffect(() => {
+    window.scrollTo(0, 0);
     var data = localStorage.getItem("result");
     setResults(JSON.parse(data));
   },[]);
