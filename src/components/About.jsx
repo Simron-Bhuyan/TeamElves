@@ -16,7 +16,7 @@ function About() {
         </div>
       </div>
       <div className="flex h-[max-content] w-[100vw]  p-5">
-        <YoutubeEmbed embedId="rokGy0huYEA" />
+        <YoutubeEmbed embedId="p0rrYiZOAwQ" />
       </div>
     </div>
   );
