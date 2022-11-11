@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Spinner from '../components/Spinner'
 import { BACKEND_URL } from "../URLConfig";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -57,6 +58,11 @@ const DatabaseAddition = (props) => {
         console.log(data);
       });
   };
+  useEffect(() => {
+    setTimeout(() => {
+      loading(false);
+    }, 3000);
+  }, []);
   return (
     <div className={`w-[100vw] ${darkMode ? "dark" : "light"}`} >
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -92,13 +98,11 @@ const DatabaseAddition = (props) => {
           </div>
         </div>
         <div
-          className={`w-[90vw] sm:w-[60vw] flex justify-center ${
+          className={`w-[100vw] flex justify-center ${
             loading ? "block" : "hidden"
           }`}
         >
-          <h3 className="font-bold text-2xl text-center">
-            Adding Repository to Database ...
-          </h3>
+        <Spinner />
         </div>
       </div>
       <Footer />

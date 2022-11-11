@@ -1,8 +1,9 @@
-import React, { useState, Fragment, Component } from "react";
+import React, { useState, Fragment, Component,useEffect } from "react";
 import { render } from "react-dom";
 import AceEditor from "react-ace";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Spinner from '../components/Spinner'
 import { FaUpload } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "ace-builds/src-noconflict/mode-java";
@@ -114,7 +115,11 @@ const EditorPage = (props) => {
       });
     props.handleFile(fileUploaded);
   };
-
+  useEffect(() => {
+    setTimeout(() => {
+      isLoading(false);
+    }, 3000);
+  }, []);
   return (
     <div className={`w-[100vw] ${darkMode ? "dark" : "light"}`}>
       <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -161,9 +166,7 @@ const EditorPage = (props) => {
             isLoading ? "flex" : "hidden"
           } justify-center items-center`}
         >
-          <div>
-            <h3 className="text-2xl font-bold">Loading...</h3>
-          </div>
+          <Spinner/>
         </div>
       </div>
       <Footer />
