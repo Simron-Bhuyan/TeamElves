@@ -49,48 +49,24 @@ def keep_words(tokens, keep_tokens):
     return tokens
 
 
-def getResults(fileName, Result):
-    myfile1 = open('file.txt', 'r')
-    myfile2 = open('database/'+fileName, 'r')
-    file1 = open('testFile1.cpp','w')
+def getResults(fileName, tokens, Result):
+    myfile2 = open(fileName, 'r')
     file2 = open('testFile2.cpp','w')
 
     # removing comments
-    for line in myfile1.readlines():
-        if not (line.startswith('//')):
-            file1.write(line)
- 
     for line in myfile2.readlines():
         if not (line.startswith('//')):
             file2.write(line)
 
     file2.close()
-    file1.close()
     myfile2.close()
-    myfile1.close()
-
-    finalfile1 = open("testFile1.cpp",'r')
-    contents1 = finalfile1.read()       
-    finalfile1.close()
-    inp = contents1
 
     finalfile2 = open("testFile2.cpp",'r')
     contents2 = finalfile2.read()       
     finalfile2.close()   
     inp2 = contents2
 
-    tokens = nltk.word_tokenize(inp)
     tokens2 = nltk.word_tokenize(inp2)
-
-    for i in range(len(tokens)):
-        if tokens[i] == 'if':
-            tokens[i] = 'conditional'
-        if tokens[i] == 'else':
-            tokens[i] = 'conditional'
-        if(tokens[i]=="for"):
-            tokens[i]="Loop"
-        if(tokens[i]=="while"):
-            tokens[i]="Loop"
     
     for i in range(len(tokens2)):
         if tokens2[i] == 'if':
@@ -102,14 +78,56 @@ def getResults(fileName, Result):
         if(tokens2[i]=="while"):
             tokens2[i]="Loop"
 
-    keep_words(tokens, keep_tokens)
     keep_words(tokens2, keep_tokens)
     sm=difflib.SequenceMatcher(None,tokens,tokens2)
     finalans=sm.ratio()*100
     finalans=round(finalans,2)
-    Result.append((fileName, finalans))
+    num=len(os.getcwd())
+    print(os.getcwd())
+    if finalans!=0 or finalans!=0.0:
+        Result.append((fileName[num+10:], finalans))
 
 def loopAllFiles(Result):
-    for file in os.listdir(os.getcwd()+'/database'):
-        # print(file)
-        getResults(file, Result)
+    myfile1 = open('file.txt', 'r')
+    file1 = open('testFile1.cpp','w')
+    
+    # removing comments
+    for line in myfile1.readlines():
+        if not (line.startswith('//')):
+            file1.write(line)
+
+    file1.close()
+    myfile1.close()
+
+    finalfile1 = open("testFile1.cpp",'r')
+    contents1 = finalfile1.read()       
+    finalfile1.close()
+    inp = contents1
+    tokens = nltk.word_tokenize(inp)
+
+    for i in range(len(tokens)):
+        if tokens[i] == 'if':
+            tokens[i] = 'conditional'
+        if tokens[i] == 'else':
+            tokens[i] = 'conditional'
+        if(tokens[i]=="for"):
+            tokens[i]="Loop"
+        if(tokens[i]=="while"):
+            tokens[i]="Loop"
+    keep_words(tokens, keep_tokens)
+
+    contents=list(os.scandir(os.getcwd()+'/database'))
+    while contents:
+        file_content = contents.pop()
+        if file_content.is_dir():
+            # print(file_content.path)
+            contents.extend(os.scandir(file_content.path))
+        else:
+            # print(file_content.path,file_content.name)
+            getResults(file_content.path, tokens, Result) 
+    Result.sort(key=lambda x:x[1],reverse=True)  
+    print(Result)
+
+# Result=[]
+# loopAllFiles(Result)
+# print(Result)

@@ -1,1 +1,7 @@
-#include <iostream> using namespace std; int main() { cout << ; return 0; }
+
+(function someDemo() {
+  var test = "Hello World!";
+  console.log(test);
+})();
+
+return () => <App />;
